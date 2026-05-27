@@ -1,8 +1,8 @@
 # Learn Tracker — Product Specification
 
-> **Version:** 1.1  
-> **Last Updated:** February 27, 2026  
-> **Status:** In Development (Advanced MVP)
+> **Version:** 2.0  
+> **Last Updated:** May 27, 2026  
+> **Status:** In Development (Advanced MVP - Next.js Standalone Migration)
 
 ---
 
@@ -27,17 +27,17 @@
 
 ## 2. Tech Stack
 
-| Layer                  | Technology             | Version               |
-| ---------------------- | ---------------------- | --------------------- |
-| **Frontend Framework** | Next.js (App Router)   | 16.1.6                |
-| **UI Library**         | React                  | 19.2.3                |
-| **Styling**            | Tailwind CSS           | v4                    |
-| **Animations**         | Framer Motion          | 12.34.2               |
-| **Icons**              | Lucide React           | 0.575.0               |
-| **Backend Framework**  | Go (standard library)  | 1.26                  |
-| **Database Driver**    | pgx v5 (Pool)          | latest                |
-| **Database**           | PostgreSQL             | —                     |
-| **Auth**               | Auth.js v5 + HS256 JWT | GitHub & Google OAuth |
+| Layer                  | Technology                              | Version               |
+| ---------------------- | --------------------------------------- | --------------------- |
+| **Frontend Framework** | Next.js (App Router - Standalone Mode)  | 16.1.6                |
+| **UI Library**         | React                                   | 19.2.3                |
+| **Styling**            | Tailwind CSS                            | v4                    |
+| **Animations**         | Framer Motion                           | 12.34.2               |
+| **Icons**              | Lucide React                            | 0.575.0               |
+| **Backend Framework**  | Next.js Serverless Route Handlers       | 16.1.6                |
+| **Database Client**    | `@neondatabase/serverless` (Neon SQL)   | 1.1.0                 |
+| **Database**           | Neon Serverless PostgreSQL              | —                     |
+| **Auth**               | Auth.js v5 (NextAuth) + Bcrypt Hashing  | Credentials Flow      |
 
 ---
 
@@ -45,39 +45,26 @@
 
 ```mermaid
 graph TB
-    subgraph Frontend["Frontend — Next.js 16"]
-        A[App Router] --> B[DashboardLayout]
-        B --> C[BentoGrid]
-        C --> D[StreakWidget]
-        C --> E[RoadmapWidget]
-        C --> F[RecentLogWidget]
-        C --> G[QuickNoteWidget]
-        C --> H["+ Add Widget"]
+    subgraph Client["Client-Side (Browser)"]
+        UI[Tailwind & Framer Motion UI]
+        Zustand[Zustand Global Store]
+        NextAuthClient[NextAuth Session Hook]
     end
 
-    subgraph Backend["Backend — Go"]
-        I[CORS Middleware] --> J[http.ServeMux]
-        J --> K["/users"]
-        J --> L["/roadmaps"]
-        J --> M["/resources"]
-        J --> N["/notes"]
-        J --> X["/projects /flashcards /inventory"]
-        J --> Y["/quests /studio /dashboard /familiar"]
+    subgraph NextjsServer["Server-Side (Next.js Standalone Node Server)"]
+        Middleware[Next.js Auth Middleware]
+        AuthRouter[NextAuth.js Credentials Provider]
+        APIRoutes[Serverless API Routes /api/*]
     end
 
-    subgraph Database["Database — PostgreSQL"]
-        O[(User)]
-        P[(Roadmap)]
-        Q[(Step)]
-        R[(Resource)]
-        S[(StudyLog)]
-        T[(Note)]
-        U[(Project)]
-        V[(Quest)]
+    subgraph Database["Database — Neon PostgreSQL"]
+        DB[(Neon PostgreSQL Serverless)]
     end
 
-    Frontend -->|HTTP REST| Backend
-    Backend -->|pgx driver| Database
+    UI -->|HTTP Fetch /api/*| Middleware
+    Middleware -->|Pass Auth Context| APIRoutes
+    AuthRouter -->|Verify Credentials| DB
+    APIRoutes -->|WebSocket SQL Template Literals| DB
 ```
 
 ### Design System
@@ -93,87 +80,66 @@ graph TB
 
 ```mermaid
 erDiagram
-    User ||--o{ Roadmap : creates
-    User ||--o{ Resource : saves
-    User ||--o{ StudyLog : logs
-    User ||--o{ Note : writes
-    User ||--|| Familiar : owns
-    Roadmap ||--o{ Step : contains
+    users ||--o{ roadmaps : creates
+    users ||--o{ resources : saves
+    users ||--o{ study_logs : logs
+    users ||--o{ notes : writes
+    users ||--o{ quests : undertakes
+    users ||--o{ studio_tasks : manages
 
-    User {
-        string id PK
-        string email UK
-        string username
+    users {
+        serial id PK
+        varchar username UK
+        varchar password_hash
+        varchar full_name
+        varchar birthdate
+        varchar school
         int xp
         int level
-        int streak
-        datetime createdAt
-        datetime updatedAt
+        int current_streak
+        varchar theme_color
+        timestamp created_at
     }
 
-    Familiar {
-        string id PK
-        string name
-        int hp
-        int maxHp
-        string status
-        string userId FK
-        datetime lastFed
+    notes {
+        serial id PK
+        int user_id FK
+        varchar title
+        text content
+        varchar category
+        timestamp created_at
     }
 
-    Roadmap {
-        string id PK
-        string title
-        string description
-        bool isActive
-        int progress
-        string userId FK
-        datetime createdAt
-        datetime updatedAt
+    flashcards {
+        serial id PK
+        int user_id FK
+        text front
+        text back
+        int category_id
+        timestamp next_review_date
+        int interval
+        double ease_factor
+        timestamp created_at
     }
 
-    Step {
-        string id PK
-        string title
-        bool isCompleted
-        int order
-        string roadmapId FK
+    quests {
+        serial id PK
+        int user_id FK
+        varchar title
+        varchar rank
+        int xp_reward
+        boolean is_completed
+        timestamp created_at
     }
 
-    Resource {
-        string id PK
-        string title
-        string url
-        string type
-        string topic
-        string userId FK
-        datetime createdAt
-    }
-
-    StudyLog {
-        string id PK
-        datetime startTime
-        datetime endTime
-        string status
-        string topic
-        string userId FK
-    }
-
-    LevelConfig {
-        int level PK
-        int minXp
-        int maxXp
-        string titleBadge
-    }
-
-    Note {
-        string id PK
-        string title
-        string content
-        string[] tags
-        string userId FK
-        datetime createdAt
-        datetime updatedAt
+    studio_tasks {
+        serial id PK
+        int user_id FK
+        varchar title
+        text description
+        varchar status
+        int category_id
+        timestamp created_at
     }
 ```
 
@@ -201,7 +167,7 @@ Tracks learning consistency and rewards progress with XP and levels.
 
 | Field               | Description                                                         |
 | ------------------- | ------------------------------------------------------------------- |
-| `streak`            | Consecutive days of logged study activity                           |
+| `current_streak`    | Consecutive days of logged study activity                           |
 | `xp`                | Experience points earned from completing steps and logging sessions |
 | `level`             | Derived from XP thresholds (displayed as badge)                     |
 | **XP Progress Bar** | Animated bar showing progress to next level                         |
@@ -219,19 +185,14 @@ Tracks learning consistency and rewards progress with XP and levels.
 
 Structured learning paths with ordered steps.
 
-**Current capabilities:**
+**Capabilities:**
 
 - Display active roadmap with step list
 - Visual distinction between completed and pending steps
-- Hover-to-reveal "Start" action on incomplete steps
 - Progress percentage tracking
-
-**Planned capabilities:**
-
 - Create, edit, and delete roadmaps
 - Mark steps as completed (toggle)
 - Auto-calculate progress based on completed steps
-- Multiple roadmaps with active selection
 
 ---
 
@@ -239,18 +200,11 @@ Structured learning paths with ordered steps.
 
 Tracks study sessions with duration and topic.
 
-**Current capabilities:**
+**Capabilities:**
 
-- Display last session topic, duration, and category
-- "Resume Session" action button
-
-**Planned capabilities:**
-
-- Built-in study timer (start/pause/stop)
-  - _Note: Frontend uses `localStorage` to persist the active timer's `startTime` to prevent data loss on browser refresh._
-- Session history view with daily/weekly/monthly stats
-- Time-per-topic analytics
-- Chart visualizations (bar/line charts)
+- Built-in study timer (start/pause/stop) with Pomodoro capabilities.
+- Live duration and XP yield calculations.
+- Context-aware feeding trigger for the virtual pet companion.
 
 ---
 
@@ -258,17 +212,11 @@ Tracks study sessions with duration and topic.
 
 Lightweight note-taking with markdown support.
 
-**Current capabilities:**
+**Capabilities:**
 
-- Full-width textarea with markdown hint
-- "AI Assist" button (UI placeholder)
-
-**Planned capabilities:**
-
-- Save notes to database with title and tags
-- Markdown rendering preview
-- Tag-based filtering and search
-- AI-powered summarization and suggestions
+- Full-width textarea with markdown support.
+- Custom saved notes grid.
+- Clean XSS prevention logic.
 
 ---
 
@@ -276,16 +224,10 @@ Lightweight note-taking with markdown support.
 
 Bookmark and categorize learning resources.
 
-**Current capabilities:**
-
-- Database model defined (title, url, type, topic)
-- Skeleton API endpoint
-
-**Planned capabilities:**
+**Capabilities:**
 
 - Add/edit/delete resources
 - Categorize by type (article, video, course, book)
-- Tag by topic
 - Quick-access resource cards on dashboard
 
 ---
@@ -294,16 +236,11 @@ Bookmark and categorize learning resources.
 
 A gamified virtual pet companion that motivates consistent learning habits.
 
-**Current mechanics:**
+**Mechanics:**
 
 - **HP Restoration (Feeding):** Users restore HP by completing quests or finishing study sessions.
-- **Stat Tracking:** level, current HP, max HP, and last fed timestamp are persisted in PostgreSQL.
+- **Stat Tracking:** Level, current HP, max HP, and last fed timestamp are persisted in Neon PostgreSQL.
 - **Context-aware Feeding:** Quests and study sessions automatically trigger familiar feeding in the frontend store.
-
-**Planned mechanics:**
-
-- **HP Decay:** Automatic health decrease over time.
-- **Status & Form:** Visual evolution of the pet based on level.
 
 ---
 
@@ -317,18 +254,8 @@ All backend API responses are standardized into a JSON envelope wrapper to ease 
 
 ```json
 {
-  "success": true,
+  "status": "success",
   "data": { ... } // or [...]
-}
-```
-
-**Paginated Success Response (e.g. `/notes`):**
-
-```json
-{
-  "success": true,
-  "data": [ ... ],
-  "pagination": { "currentPage": 1, "totalPages": 5, "totalItems": 42 }
 }
 ```
 
@@ -336,50 +263,32 @@ All backend API responses are standardized into a JSON envelope wrapper to ease 
 
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "DB_ERROR",
-    "message": "Human readable error string",
-    "details": []
-  }
+  "status": "error",
+  "code": "DB_ERROR",
+  "message": "Human readable error string"
 }
 ```
 
-### Current Implemented Endpoints
+### Route Table (Next.js Serverless Routes)
 
-| Method    | Endpoint                           | Description                  | Status         |
-| --------- | ---------------------------------- | ---------------------------- | -------------- |
-| `GET`     | `/health`                          | Health check                 | ✅ Implemented |
-| `GET`     | `/api/v1/users`                    | List users (Stub)            | ✅ Implemented |
-| `GET/PUT` | `/api/v1/notes`                    | Full CRUD + Pagination/XSS   | ✅ Implemented |
-| `CRUD`    | `/projects /flashcards /inventory` | Resources                    | ✅ Implemented |
-| `CRUD`    | `/quests /studio /dashboard`       | Gamification & Layout        | ✅ Implemented |
-| `GET/PUT` | `/api/v1/familiar`                 | Familiar HP & Status updates | ✅ Implemented |
+All paths are relative to the deployment root:
 
----
-
-### Planned Full API (Roadmap)
-
-| Method   | Endpoint                               | Description                 |
-| -------- | -------------------------------------- | --------------------------- |
-| `POST`   | `/api/v1/users`                        | Create user                 |
-| `GET`    | `/api/v1/users/{id}`                   | Get user profile            |
-| `PUT`    | `/api/v1/users/{id}`                   | Update user profile         |
-| `POST`   | `/api/v1/roadmaps`                     | Create roadmap              |
-| `GET`    | `/api/v1/roadmaps/{id}`                | Get roadmap with steps      |
-| `PUT`    | `/api/v1/roadmaps/{id}`                | Update roadmap              |
-| `DELETE` | `/api/v1/roadmaps/{id}`                | Delete roadmap              |
-| `PUT`    | `/api/v1/roadmaps/{id}/steps/{stepId}` | Toggle step completion      |
-| `POST`   | `/api/v1/study-logs`                   | Log a study session         |
-| `GET`    | `/api/v1/study-logs`                   | Get study history           |
-| `GET`    | `/api/v1/study-logs/stats`             | Get aggregated stats        |
-| `POST`   | `/api/v1/notes`                        | Create note                 |
-| `GET`    | `/api/v1/notes/{id}`                   | Get note                    |
-| `PUT`    | `/api/v1/notes/{id}`                   | Update note                 |
-| `DELETE` | `/api/v1/notes/{id}`                   | Delete note                 |
-| `POST`   | `/api/v1/resources`                    | Add resource                |
-| `GET`    | `/api/v1/resources`                    | List resources (filterable) |
-| `DELETE` | `/api/v1/resources/{id}`               | Delete resource             |
+| Method   | Endpoint                      | Description                                    | Auth Required |
+| -------- | ----------------------------- | ---------------------------------------------- | ------------- |
+| `POST`   | `/api/auth/signup`            | User registration with Bcrypt encryption        | No            |
+| `GET`    | `/api/notes`                  | Get paginated notes list                       | Yes           |
+| `POST`   | `/api/notes`                  | Create a new note                              | Yes           |
+| `DELETE` | `/api/notes/[id]`             | Delete a specific note                         | Yes           |
+| `GET`    | `/api/flashcards`             | List active spaced-repetition cards            | Yes           |
+| `POST`   | `/api/flashcards`             | Add flashcard to SRS deck                      | Yes           |
+| `PUT`    | `/api/flashcards/[id]/review` | Submit quality grade to SM-2 SRS Algorithm     | Yes           |
+| `GET`    | `/api/quests`                 | List active daily quests                       | Yes           |
+| `PUT`    | `/api/quests/[id]/complete`   | Log quest completion and trigger XP allocation | Yes           |
+| `GET`    | `/api/studio`                 | Get all Kanban board items                    | Yes           |
+| `POST`   | `/api/studio`                 | Add a new Creator Pipeline task                | Yes           |
+| `PUT`    | `/api/studio/[id]`            | Move pipeline task column status               | Yes           |
+| `GET`    | `/api/familiar`               | Fetch pet HP, level, and feed timestamps       | Yes           |
+| `PUT`    | `/api/familiar/feed`          | Restores HP and persists new familiar status   | Yes           |
 
 ---
 
@@ -387,56 +296,30 @@ All backend API responses are standardized into a JSON envelope wrapper to ease 
 
 ```
 LearnTracker/
-├── backend/
-│   ├── cmd/
-│   │   └── server/
-│   │       └── main.go             # Go entry point
-│   ├── internal/
-│   │   ├── config/
-│   │   │   └── config.go           # Env config
-│   │   ├── database/
-│   │   │   └── database.go         # pgx connection pool
-│   │   ├── handlers/
-│   │   │   ├── common.go           # JSON helpers
-│   │   │   ├── notes.go            # Paginated notes + XSS config
-│   │   │   └── ... (others)
-│   │   ├── middleware/
-│   │   │   ├── auth.go             # HS256 JWT Authentication
-│   │   │   └── context.go          # Context injection
-│   │   ├── models/
-│   │   │   └── models.go           # Go structs (*time.Time nullables)
-│   │   ├── response/
-│   │   │   └── response.go         # Standardized API Envelope
-│   │   ├── sanitize/
-│   │   │   └── sanitize.go         # bluemonday XSS prevention
-│   │   └── router/
-│   │       └── router.go           # Go 1.22+ ServeMux
-│   ├── migrations/
-│   │   └── 001_phase2.sql          # DB Schema Definitions
-│   ├── go.mod
-│   └── .env
-│
-├── frontend/
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── layout.tsx          # Root layout
-│   │   │   ├── page.tsx            # Dashboard page
-│   │   │   └── globals.css         # Global styles
-│   │   └── components/
-│   │       ├── dashboard/
-│   │       │   ├── BentoGrid.tsx    # Grid layout
-│   │       │   └── widgets/
-│   │       │       ├── StreakWidget.tsx
-│   │       │       ├── RoadmapWidget.tsx
-│   │       │       ├── RecentLogWidget.tsx
-│   │       │       └── QuickNoteWidget.tsx
-│   │       ├── layout/
-│   │       │   └── DashboardLayout.tsx
-│   │       └── ui/
-│   │           └── GlassCard.tsx    # Shared glass card
-│   └── package.json
-│
-└── README.md
+└── frontend/
+    ├── src/
+    │   ├── app/
+    │   │   ├── (dashboard)/             # Main protected section
+    │   │   │   ├── studio/              # Creator Pipeline Kanban page
+    │   │   │   ├── flashcards/          # Spaced repetition list page
+    │   │   │   └── quests/              # Tavern RPG Quests page
+    │   │   ├── api/                     # 100% Native Next.js serverless route handlers
+    │   │   │   ├── auth/                # signup and NextAuth handlers
+    │   │   │   ├── familiar/            # Tamagotchi status and feed endpoints
+    │   │   │   ├── quests/              # RPG Quests list and complete handlers
+    │   │   │   └── studio/              # Kanban board and task columns handlers
+    │   │   ├── login/                   # Elegant custom login page
+    │   │   └── globals.css              # Custom visual layout layer
+    │   ├── components/                  # Premium UI components
+    │   │   ├── studio/                  # Kanban KanbanColumn and AddTaskModal
+    │   │   └── ui/                      # Shared premium GlassCard
+    │   ├── lib/
+    │   │   ├── api.ts                   # Relative path API fetch wrapper
+    │   │   ├── api-helpers.ts           # Standardized ok/err wrappers & session checks
+    │   │   └── db.ts                    # Neon PostgreSQL client initialization
+    │   └── store/
+    │       └── useDashboardStore.ts     # Frontend Zustand global store
+    └── package.json
 ```
 
 ---
@@ -444,70 +327,50 @@ LearnTracker/
 ## 8. Development Roadmap
 
 ### Phase 1 — Foundation ✅
-
-- [x] Project scaffolding (Next.js + Go)
-- [x] Database schema design
-- [x] Go struct models
+- [x] Project scaffolding (Next.js Standalone Monorepo)
+- [x] Database schema design in Neon
 - [x] Bento Grid dashboard layout
 - [x] GlassCard design system component
 - [x] All 5 main dashboard widgets (Streak, Roadmap, Timer, Daily Goals, Quick Note)
-- [x] CRUD API for Projects, Flashcards, Quests, etc.
-- [x] CORS configuration (Go middleware)
 
 ### Phase 2 — Core Functionality ✅
+- [x] Connect to Neon Serverless PostgreSQL with WebSocket template literals
+- [x] Standardized API JSON response wrappers
+- [x] Full CRUD Next.js Route Handlers (Notes, Flashcards, Quests, Kanban, etc.)
+- [x] Wire frontend store to real relative API paths (solving localhost fallback)
 
-- [x] Connect to PostgreSQL with pgxpool
-- [x] Implement full CRUD API in Go
-- [x] Note CRUD with markdown rendering and pagination
-- [x] Setup XSS sanitization (bluemonday) and generalized envelope API responses
-- [x] HS256 JWT Authentication Middleware in Go
-- [x] Wire frontend widgets to real API data (via Zustand + Fetch)
-- [x] Study timer tracking and session logging
+### Phase 3 — Gamification & RPG Mechanics ✅
+- [x] XP calculation engine and level-up thresholds logic
+- [x] Spaced Repetition (SM-2) algorithm for active flashcard review
+- [x] Daily Quest generation (weighted rank acak)
+- [x] Virtual Familiar (HP/Level/Feeding) state persistence
 
-### Phase 3 — Gamification & Analytics ✅
+### Phase 4 — Authentication & Multi-User Flow ✅
+- [x] NextAuth.js v5 integration with serverless Credentials Provider
+- [x] Password hashing using Bcrypt
+- [x] Secure session cookie tracking
+- [x] Multi-user data isolation across all database queries
 
-- [x] XP calculation engine and level-up system
-- [x] Level-up system with thresholds logic in frontend store
-- [x] Virtual Familiar state management (HP/Level/Feeding)
-- [x] Daily Quest generation (weighted random ranking)
-- [ ] Streak tracking logic (daily reset calculation)
-- [ ] Study time analytics (daily/weekly charts)
-
-### Phase 4 — Authentication & Multi-User ✅
-
-- [x] Auth.js v5 integration with GitHub and Google Providers
-- [x] Custom HS256 JWT strategy (solving JWE cross-platform issue)
-- [x] Secure API calls with non-HttpOnly JWT cookie for Go backend
-- [x] User registration/login flows and data isolation
-
-### Phase 5 — Polish & AI 🔲
-
+### Phase 5 — Refinements & AI 🔲
 - [ ] AI-assisted note summarization
 - [ ] AI roadmap suggestions
-- [ ] Widget customization ("Add Widget" functionality)
-- [ ] Dark/light theme toggle
-- [ ] Mobile-first responsive refinements
+- [ ] Mobile-first layout optimizations
 - [ ] PWA support for offline access
 
 ---
 
 ## 9. Non-Functional Requirements
 
-| Requirement           | Target                                   |
-| --------------------- | ---------------------------------------- |
-| **Performance**       | Dashboard loads in < 2s on 3G            |
-| **Responsiveness**    | Fully functional on mobile (375px+)      |
-| **Accessibility**     | WCAG 2.1 AA compliance                   |
-| **Browser Support**   | Chrome, Firefox, Safari, Edge (latest 2) |
-| **API Response Time** | < 200ms for all endpoints                |
-| **Data Integrity**    | All mutations validated via Go structs   |
+| Requirement           | Target                                     |
+| --------------------- | ------------------------------------------ |
+| **Performance**       | Dashboard loads in < 1.5s on Vercel        |
+| **Responsiveness**    | Fully functional on mobile (375px+)        |
+| **API Response Time** | < 150ms for all Neon serverless endpoints  |
+| **Data Integrity**    | Strict parameterized template sql queries |
 
 ---
 
 ## 10. Open Questions
 
-1. **Auth Strategy** — _Decision made:_ Use Auth.js v5 with a custom HS256 JWT strategy to communicate statelessly with the Go backend.
-2. **AI Provider** — Which LLM provider for "AI Assist" feature (OpenAI, Google Gemini, local model)?
-3. **Deployment Target** — Vercel (frontend) + Railway/Render (backend) + Supabase (database)?
-4. **Notification System** — Add streak reminders via email or push notifications?
-5. **Social Features** — Should users be able to share roadmaps or compete on leaderboards?
+1. **AI Provider** — Which LLM provider for "AI Assist" feature (Google Gemini is highly recommended for direct token integration)?
+2. **Notification System** — Should we add push notifications for daily quest reminders or pet status alerts?
