@@ -71,12 +71,12 @@ export const api = {
     }
 
     const json = await response.json();
-    // Unwrap standardized envelope: {success: true, data: ...}
+    // Unwrap standardized envelope: { status: "success", data: ... } or { success: true, data: ... }
     if (
       json &&
       typeof json === "object" &&
-      "success" in json &&
-      "data" in json
+      "data" in json &&
+      (json.status === "success" || json.success === true || ("success" in json && json.success))
     ) {
       return json.data as T;
     }

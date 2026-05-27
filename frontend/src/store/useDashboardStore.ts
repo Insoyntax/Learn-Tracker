@@ -703,12 +703,12 @@ export const useDashboardStore = create<DashboardState>()(
 
                     set({
                         // @ts-ignore - Map snake_case to camelCase
-                        quests: Array.isArray(quests) ? quests.map(q => ({ ...q, xpReward: q.xp_reward, isCompleted: q.is_completed })) : [],
-                        flashcards: Array.isArray(flashcards) ? flashcards.map(f => ({ ...f, categoryId: String(f.category_id), nextReviewDate: f.next_review_date, easeFactor: f.ease_factor })) : [],
+                        quests: Array.isArray(quests) ? quests.map(q => ({ ...q, id: String(q.id), xpReward: q.xp_reward, isCompleted: q.is_completed })) : [],
+                        flashcards: Array.isArray(flashcards) ? flashcards.map(f => ({ ...f, id: String(f.id), categoryId: String(f.category_id), nextReviewDate: f.next_review_date, easeFactor: f.ease_factor })) : [],
                         // @ts-ignore
-                        inventoryItems: Array.isArray(inventoryItems) ? inventoryItems.map(i => ({ ...i, categoryId: String(i.category_id), createdAt: i.created_at })) : [],
+                        inventoryItems: Array.isArray(inventoryItems) ? inventoryItems.map(i => ({ ...i, id: String(i.id), categoryId: String(i.category_id), createdAt: i.created_at })) : [],
                         // @ts-ignore
-                        studioTasks: Array.isArray(studioTasks) ? studioTasks.map(t => ({ ...t, categoryId: String(t.category_id), createdAt: t.created_at })) : [],
+                        studioTasks: Array.isArray(studioTasks) ? studioTasks.map(t => ({ ...t, id: String(t.id), categoryId: String(t.category_id), createdAt: t.created_at })) : [],
                         // @ts-ignore
                         layout: dashboardLayout && dashboardLayout.layout_data ? JSON.parse(dashboardLayout.layout_data) : get().layout,
                         userStats: {
