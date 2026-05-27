@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { GlassCard } from "@/components/ui/GlassCard";
-import { Clock, Play, Pause, RotateCcw, CheckCircle2, ChevronDown } from "lucide-react";
+import { BrutalCard } from "@/components/ui/BrutalCard";
+import { Clock, Play, Pause, RotateCcw, CheckSquare, ChevronDown } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import toast from "react-hot-toast";
 
@@ -15,7 +15,7 @@ const formatTime = (seconds: number): string => {
 
 export const FocusTimerWidget = ({ className }: { className?: string }) => {
     const { isRunning, timeElapsed, topic, targetMinutes, targetReached } = useDashboardStore((s) => s.studyTimer);
-    const category = useDashboardStore((s) => s.studyTimer.category); // Fix: Access category safely
+    const category = useDashboardStore((s) => s.studyTimer.category);
     const categories = useDashboardStore((s) => s.categories);
 
     const toggleTimer = useDashboardStore((s) => s.toggleTimer);
@@ -29,14 +29,12 @@ export const FocusTimerWidget = ({ className }: { className?: string }) => {
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const toastFiredRef = useRef(false);
 
-    // Sync default timer from settings when timer is idle
     useEffect(() => {
         if (!isRunning && timeElapsed === 0 && defaultTimerMinutes !== targetMinutes) {
             setTargetMinutes(defaultTimerMinutes);
         }
     }, [defaultTimerMinutes, isRunning, timeElapsed, targetMinutes, setTargetMinutes]);
 
-    // Category Dropdown State
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
     useEffect(() => {
@@ -53,16 +51,17 @@ export const FocusTimerWidget = ({ className }: { className?: string }) => {
         };
     }, [isRunning, tickTimer]);
 
-    // Fire toast when target is reached
     useEffect(() => {
         if (targetReached && !toastFiredRef.current) {
             toastFiredRef.current = true;
             toast("🎯 Target Reached! Keep going or finish up.", {
                 duration: 4000,
                 style: {
-                    background: "#1e1e2e",
+                    background: "var(--color-card)",
                     color: "#fff",
-                    border: "1px solid rgba(99, 102, 241, 0.3)",
+                    border: "2px solid var(--color-primary)",
+                    borderRadius: "0",
+                    boxShadow: "4px 4px 0px 0px var(--color-primary)"
                 },
                 icon: "⏱️",
             });
@@ -75,18 +74,24 @@ export const FocusTimerWidget = ({ className }: { className?: string }) => {
     const handleFinish = () => {
         finishSession();
         toast.success("Session saved! XP Awarded 🌟", {
-            style: { background: "#1e1e2e", color: "#fff" },
+            style: { 
+                background: "var(--color-card)", 
+                color: "#fff", 
+                border: "2px solid var(--color-accent)",
+                borderRadius: "0",
+                boxShadow: "4px 4px 0px 0px var(--color-accent)"
+            },
         });
     };
 
     return (
-        <GlassCard className={`p-6 flex flex-col justify-between overflow-visible relative z-20 ${className}`}>
+        <BrutalCard className={`p-8 flex flex-col justify-between overflow-visible relative z-20 ${className}`}>
             {/* Header */}
             <div className="flex justify-between items-start">
                 <div className="relative">
                     <button
                         onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                        className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[10px] font-medium text-gray-400 transition-colors border border-white/5"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-transparent text-[10px] font-bold text-slate-100 uppercase font-Outfit transition-all border-2 border-white/20 hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]"
                     >
                         <span>{category || "Select Category"}</span>
                         <ChevronDown className="w-3 h-3" />
@@ -98,9 +103,9 @@ export const FocusTimerWidget = ({ className }: { className?: string }) => {
                                 initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 5 }}
-                                className="absolute top-full left-0 mt-2 w-32 bg-[#0f1117] border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden"
+                                className="absolute top-full left-0 mt-2 w-40 bg-card border-2 border-white/20 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] z-50 overflow-hidden"
                             >
-                                <div className="max-h-32 overflow-y-auto custom-scrollbar p-1">
+                                <div className="max-h-32 overflow-y-auto custom-scrollbar p-2 space-y-1">
                                     {categories.map((c) => (
                                         <button
                                             key={c}
@@ -108,8 +113,11 @@ export const FocusTimerWidget = ({ className }: { className?: string }) => {
                                                 setTimerCategory(c);
                                                 setIsCategoryOpen(false);
                                             }}
-                                            className={`w-full text-left px-2 py-1.5 rounded text-[10px] transition-colors ${category === c ? "bg-indigo-500/20 text-indigo-400" : "text-slate-300 hover:bg-slate-800"
-                                                }`}
+                                            className={`w-full text-left px-3 py-2 border-2 transition-all text-xs font-Outfit font-bold uppercase ${
+                                                category === c 
+                                                ? "bg-primary text-black border-primary" 
+                                                : "bg-transparent text-slate-300 border-transparent hover:border-white/20 hover:bg-white/5"
+                                            }`}
                                         >
                                             {c}
                                         </button>
@@ -120,48 +128,49 @@ export const FocusTimerWidget = ({ className }: { className?: string }) => {
                     </AnimatePresence>
                 </div>
 
-                <div className={`p-2 rounded-xl border transition-colors ${isRunning ? 'bg-green-500/10 border-green-500/10' : 'bg-purple-500/10 border-purple-500/10'}`}>
-                    <Clock className={`w-4 h-4 ${isRunning ? 'text-green-400' : 'text-purple-400'}`} />
+                <div className={`p-2 border-2 shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] transition-colors ${isRunning ? 'bg-primary border-primary text-black' : 'bg-transparent border-white/20 text-slate-100'}`}>
+                    <Clock className="w-5 h-5" />
                 </div>
             </div>
 
             {/* Timer Display */}
-            <div className="mt-2 flex flex-col items-center">
-                <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold mb-1">Focus Timer</p>
+            <div className="mt-4 flex flex-col items-center">
+                <p className="text-xs uppercase tracking-widest text-slate-300 font-bold mb-2 font-Outfit">Focus Timer</p>
                 <motion.span
                     key={timeElapsed}
-                    className={`text-4xl font-bold font-mono tabular-nums tracking-tight transition-colors duration-300 ${targetReached ? "text-emerald-400" : "text-white"}`}
+                    className={`text-5xl font-bold font-Outfit tabular-nums tracking-tight transition-colors duration-300 ${targetReached ? "text-primary" : "text-white"}`}
                 >
                     {formatTime(timeElapsed)}
                 </motion.span>
-                <p className="text-xs text-gray-500 mt-1">{topic}</p>
+                <p className="text-sm text-slate-400 mt-2 font-Inter font-medium">{topic}</p>
             </div>
 
             {/* Controls */}
-            <div className="flex items-center justify-center gap-3 mt-auto pt-4 relative">
+            <div className="flex items-center justify-center gap-4 mt-auto pt-6 relative">
                 {/* Reset Button */}
                 {!isRunning && timeElapsed > 0 && (
                     <button
                         onClick={resetTimer}
-                        className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-red-500/20 hover:text-red-400 text-gray-500 transition-all border border-white/5"
+                        className="w-10 h-10 bg-transparent flex items-center justify-center hover:bg-white/10 text-slate-300 transition-all border-2 border-white/20 hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]"
                         title="Reset"
                     >
-                        <RotateCcw className="w-3.5 h-3.5" />
+                        <RotateCcw className="w-4 h-4" />
                     </button>
                 )}
 
                 {/* Play/Pause Button */}
                 <button
                     onClick={toggleTimer}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${isRunning
-                        ? "bg-amber-500 hover:bg-amber-400 text-white shadow-amber-500/20"
-                        : "bg-indigo-500 hover:bg-indigo-400 text-white shadow-indigo-500/20"
-                        }`}
+                    className={`w-14 h-14 flex items-center justify-center transition-all border-2 ${
+                        isRunning
+                        ? "bg-accent border-accent text-black shadow-[4px_4px_0px_0px_var(--color-accent)] hover:shadow-[2px_2px_0px_0px_var(--color-accent)] hover:translate-y-0.5 hover:translate-x-0.5"
+                        : "bg-primary border-primary text-black shadow-[4px_4px_0px_0px_var(--color-primary)] hover:shadow-[2px_2px_0px_0px_var(--color-primary)] hover:translate-y-0.5 hover:translate-x-0.5"
+                    }`}
                 >
                     {isRunning ? (
-                        <Pause className="w-5 h-5 fill-current" />
+                        <Pause className="w-6 h-6 fill-current" />
                     ) : (
-                        <Play className="w-5 h-5 fill-current ml-0.5" />
+                        <Play className="w-6 h-6 fill-current ml-1" />
                     )}
                 </button>
 
@@ -169,13 +178,13 @@ export const FocusTimerWidget = ({ className }: { className?: string }) => {
                 {!isRunning && timeElapsed > 5 && (
                     <button
                         onClick={handleFinish}
-                        className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center hover:bg-emerald-500 hover:text-white text-emerald-400 transition-all border border-emerald-500/20"
+                        className="w-10 h-10 bg-primary/10 flex items-center justify-center hover:bg-primary text-primary hover:text-black transition-all border-2 border-primary shadow-[2px_2px_0px_0px_var(--color-primary)]"
                         title="Finish Session & Save Log"
                     >
-                        <CheckCircle2 className="w-4 h-4" />
+                        <CheckSquare className="w-5 h-5" />
                     </button>
                 )}
             </div>
-        </GlassCard>
+        </BrutalCard>
     );
 };

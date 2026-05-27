@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { GlassCard } from "@/components/ui/GlassCard";
-import { Map, CheckCircle2, Circle, Trophy, RotateCcw } from "lucide-react";
+import { BrutalCard } from "@/components/ui/BrutalCard";
+import { Map, CheckSquare, Square, Trophy, RotateCcw } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import confetti from "canvas-confetti";
 
@@ -51,14 +51,14 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                     angle: 60,
                     spread: 55,
                     origin: { x: 0, y: 0.7 },
-                    colors: ["#6366f1", "#818cf8", "#a5b4fc", "#fbbf24", "#34d399"],
+                    colors: ["#CFFF04", "#F59E0B", "#ffffff"],
                 });
                 confetti({
                     particleCount: 3,
                     angle: 120,
                     spread: 55,
                     origin: { x: 1, y: 0.7 },
-                    colors: ["#6366f1", "#818cf8", "#a5b4fc", "#fbbf24", "#34d399"],
+                    colors: ["#CFFF04", "#F59E0B", "#ffffff"],
                 });
                 if (Date.now() < end) {
                     requestAnimationFrame(frame);
@@ -83,22 +83,32 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
 
     if (!activeRoadmap) {
         return (
-            <GlassCard className={`p-6 flex items-center justify-center ${className}`}>
-                <div className="text-center">
-                    <Map className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-                    <p className="text-gray-500 text-sm">No active roadmap selected.</p>
+            <BrutalCard className={`p-8 flex items-center justify-center relative overflow-hidden ${className}`}>
+                {/* SVG Line-art Doodle Background */}
+                <div className="absolute inset-0 opacity-20 pointer-events-none flex items-center justify-center">
+                    <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M40 40 L160 40 L160 160 L40 160 Z" stroke="white" strokeWidth="2" strokeDasharray="5 5" />
+                        <circle cx="100" cy="100" r="40" stroke="white" strokeWidth="2" />
+                        <path d="M100 20 L100 180" stroke="white" strokeWidth="2" />
+                        <path d="M20 100 L180 100" stroke="white" strokeWidth="2" />
+                        <circle cx="160" cy="40" r="4" fill="var(--color-primary)" />
+                        <circle cx="40" cy="160" r="4" fill="var(--color-accent)" />
+                    </svg>
                 </div>
-            </GlassCard>
+                
+                <div className="text-center relative z-10">
+                    <Map className="w-8 h-8 text-slate-100 mx-auto mb-4" />
+                    <p className="text-slate-100 text-lg font-Outfit font-bold">No active roadmap</p>
+                    <p className="text-slate-400 text-sm font-Inter mt-1">Select one to begin tracking.</p>
+                </div>
+            </BrutalCard>
         );
     }
 
     return (
-        <GlassCard className={`p-6 relative overflow-hidden flex flex-col ${className}`}>
-            {/* Background glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-
+        <BrutalCard className={`p-8 relative flex flex-col ${className}`}>
             {/* Eyebrow */}
-            <p className="relative z-10 text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">🗺️ Active Roadmap</p>
+            <p className="relative z-10 text-xs font-bold uppercase tracking-widest text-slate-100 mb-3 font-Outfit">🗺️ Active Roadmap</p>
 
             <AnimatePresence mode="wait">
                 {showSuccess ? (
@@ -116,17 +126,17 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                             animate={{ rotate: 0, scale: 1 }}
                             transition={{ type: "spring", damping: 12, delay: 0.1 }}
                         >
-                            <Trophy className="w-16 h-16 text-yellow-400 drop-shadow-lg" />
+                            <Trophy className="w-16 h-16 text-accent drop-shadow-md" />
                         </motion.div>
                         <div className="text-center">
-                            <h3 className="text-xl font-bold text-white mb-1">Path Mastered! 🏆</h3>
-                            <p className="text-sm text-gray-400">You completed all steps in {title}</p>
+                            <h3 className="text-2xl font-bold text-white mb-1 font-Outfit">Path Mastered! 🏆</h3>
+                            <p className="text-sm text-slate-400 font-Inter">You completed all steps in {title}</p>
                         </div>
                         <motion.button
-                            whileHover={{ scale: 1.05 }}
+                            whileHover={{ scale: 1.05, boxShadow: "4px 4px 0px 0px var(--color-accent)" }}
                             whileTap={{ scale: 0.95 }}
                             onClick={handleReset}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium transition-colors shadow-lg shadow-indigo-500/20"
+                            className="flex items-center gap-2 px-6 py-3 border-2 border-accent bg-transparent text-accent text-sm font-bold font-Outfit uppercase transition-all shadow-[2px_2px_0px_0px_var(--color-accent)]"
                         >
                             <RotateCcw className="w-4 h-4" />
                             Choose Next Path
@@ -144,28 +154,28 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                         {/* Header */}
                         <div className="flex items-center justify-between mb-5">
                             <div className="flex items-center gap-4">
-                                <div className="p-2.5 bg-blue-500/10 rounded-xl border border-blue-500/10">
-                                    <Map className="w-5 h-5 text-blue-400" />
+                                <div className="p-2.5 border-2 border-white/20 bg-transparent shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]">
+                                    <Map className="w-5 h-5 text-slate-100" />
                                 </div>
                                 <div>
-                                    <h3 className="text-base font-semibold text-white tracking-tight">📍 {title}</h3>
-                                    <p className="text-[10px] text-blue-400/80 font-medium tracking-wider uppercase">{category}</p>
+                                    <h3 className="text-lg font-bold text-white tracking-tight font-Outfit">📍 {title}</h3>
+                                    <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase font-Outfit mt-1">{category}</p>
                                 </div>
                             </div>
                             <motion.span
                                 key={safeProgress}
-                                initial={{ scale: 1.2, color: "#818cf8" }}
-                                animate={{ scale: 1, color: "#9ca3af" }}
-                                className="text-xs font-mono bg-white/5 px-2 py-1 rounded-md border border-white/5 tabular-nums"
+                                initial={{ scale: 1.2, color: "var(--color-primary)" }}
+                                animate={{ scale: 1, color: "var(--color-foreground)" }}
+                                className="text-xs font-Outfit font-bold border-2 border-white/20 px-2 py-1 shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] tabular-nums"
                             >
                                 {safeProgress}%
                             </motion.span>
                         </div>
 
                         {/* Progress bar */}
-                        <div className="h-1 bg-white/5 rounded-full overflow-hidden mb-5">
+                        <div className="h-2 bg-transparent border-2 border-white/20 overflow-hidden mb-6">
                             <motion.div
-                                className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.4)]"
+                                className="h-full bg-primary"
                                 initial={false}
                                 animate={{ width: `${safeProgress}%` }}
                                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -173,7 +183,7 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                         </div>
 
                         {/* Steps list */}
-                        <div className="space-y-2.5 flex-1 overflow-y-auto pr-2">
+                        <div className="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar">
                             {steps.map((step, idx) => (
                                 <motion.button
                                     key={step.id}
@@ -182,10 +192,10 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                                     transition={{ delay: idx * 0.08 + 0.15 }}
                                     onClick={() => handleToggle(step.id)}
                                     className={`
-                                        group w-full flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 text-left
+                                        group w-full flex items-center gap-3 p-4 border-2 transition-all duration-200 text-left
                                         ${step.isCompleted
-                                            ? "bg-blue-500/5 border-blue-500/10 hover:bg-blue-500/10"
-                                            : "bg-white/[0.02] border-white/5 hover:bg-white/[0.05] hover:border-white/10"
+                                            ? "border-primary/50 bg-primary/5"
+                                            : "border-white/20 bg-transparent hover:border-white/50 hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] hover:-translate-y-0.5"
                                         }
                                     `}
                                 >
@@ -195,18 +205,18 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                                         transition={{ duration: 0.2 }}
                                     >
                                         {step.isCompleted ? (
-                                            <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
+                                            <CheckSquare className="w-5 h-5 text-primary shrink-0" />
                                         ) : (
-                                            <Circle className="w-5 h-5 text-gray-600 group-hover:text-gray-400 shrink-0 transition-colors" />
+                                            <Square className="w-5 h-5 text-slate-400 group-hover:text-slate-100 shrink-0 transition-colors" />
                                         )}
                                     </motion.div>
 
-                                    <span className={`text-sm font-medium transition-colors ${step.isCompleted ? "text-gray-400 line-through decoration-gray-600" : "text-gray-200"}`}>
+                                    <span className={`text-sm font-Inter font-medium transition-colors ${step.isCompleted ? "text-slate-500 line-through decoration-slate-500" : "text-slate-200"}`}>
                                         {step.title}
                                     </span>
 
                                     <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-gray-400">
+                                        <span className="text-[10px] font-Outfit font-bold border-2 border-white/20 px-2 py-0.5 text-slate-300">
                                             {step.isCompleted ? "Undo" : "+50 XP"}
                                         </span>
                                     </div>
@@ -216,6 +226,6 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </GlassCard>
+        </BrutalCard>
     );
 };

@@ -46,62 +46,58 @@ export const Sidebar = () => {
                 key={item.href}
                 href={item.href}
                 className={`
-          group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 relative overflow-hidden
+          group flex items-center gap-3 px-3 py-3 rounded-none transition-all duration-200 relative overflow-hidden border-2
           ${isActive
-                        ? 'bg-white/10 text-white shadow-inner'
-                        : 'text-gray-400 hover:text-white hover:bg-white/5'}
+                        ? 'bg-primary border-primary text-black shadow-[4px_4px_0px_0px_var(--color-primary)] translate-x-1 -translate-y-1'
+                        : 'bg-transparent border-transparent text-slate-400 hover:text-slate-100 hover:border-white/20 hover:bg-white/5'}
         `}
             >
-                {isActive && (
-                    <motion.div
-                        layoutId="activeNav"
-                        className="absolute left-0 w-1 h-6 bg-indigo-500 rounded-r-full"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.2 }}
-                    />
-                )}
+                <item.icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? 'text-black' : 'group-hover:text-primary'}`} />
 
-                <item.icon className={`w-6 h-6 shrink-0 ${isActive ? 'text-indigo-400' : 'group-hover:text-indigo-300'} transition-colors`} />
-
-                <span className="hidden lg:block font-medium text-sm">
+                <span className="hidden lg:block font-Outfit font-bold text-sm tracking-wide uppercase">
                     {item.label}
                 </span>
 
                 {isActive && (
-                    <ChevronRight className="w-4 h-4 ml-auto hidden lg:block text-indigo-400 opacity-50" />
+                    <ChevronRight className="w-4 h-4 ml-auto hidden lg:block text-black opacity-70" />
                 )}
             </Link>
         );
     };
 
     return (
-        <aside className="fixed left-0 top-0 h-full w-20 lg:w-64 border-r border-white/5 bg-black/50 backdrop-blur-xl z-50 flex flex-col justify-between py-6 transition-all duration-300">
+        <aside className="fixed left-0 top-0 h-full w-20 lg:w-64 border-r-2 border-white/20 bg-card z-50 flex flex-col justify-between py-6 transition-all duration-300">
 
             {/* Logo Area */}
             <div className="px-4 lg:px-6 mb-8 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                    <span className="font-bold text-white text-xl">L</span>
+                <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                        <path d="M10 90 L50 10 L90 90 Z" stroke="var(--color-primary)" strokeWidth="6" strokeLinejoin="miter" />
+                        <path d="M30 60 L70 60" stroke="var(--color-accent)" strokeWidth="6" />
+                        <circle cx="50" cy="40" r="6" fill="var(--color-accent)" />
+                    </svg>
                 </div>
-                <span className="hidden lg:block font-bold text-lg tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                    Learn Tracker
+                <span className="hidden lg:block font-Outfit font-bold text-xl tracking-tighter text-white">
+                    Learn<span className="text-primary">Tracker</span>
                 </span>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-2 lg:px-4 space-y-1">
+            <nav className="flex-1 px-2 lg:px-4 space-y-2 overflow-y-auto custom-scrollbar">
                 {navItems.map(renderNavLink)}
             </nav>
 
             {/* Footer / Settings + User Profile */}
-            <div className="px-2 lg:px-4 mt-auto space-y-2">
+            <div className="px-2 lg:px-4 mt-4 space-y-2 pt-4 border-t-2 border-white/20">
                 {bottomNavItems.map(renderNavLink)}
 
-                <div className="pt-4 border-t border-white/5 flex items-center gap-3 px-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 border border-white/10" />
+                <div className="pt-4 flex items-center gap-3 px-3">
+                    <div className="w-10 h-10 border-2 border-white/20 bg-black flex items-center justify-center shrink-0">
+                        <span className="font-Outfit font-bold text-primary">U</span>
+                    </div>
                     <div className="hidden lg:flex flex-col">
-                        <span className="text-sm font-medium text-white">{userName}</span>
-                        <span className="text-xs text-gray-500">Pro Plan</span>
+                        <span className="text-sm font-bold text-white font-Outfit">{userName}</span>
+                        <span className="text-[10px] text-accent font-bold uppercase tracking-wider">Hacker Plan</span>
                     </div>
                 </div>
             </div>

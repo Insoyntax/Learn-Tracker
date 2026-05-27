@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { BrutalCard } from "@/components/ui/BrutalCard";
 import { Flame, TrendingUp } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useState } from "react";
@@ -24,65 +24,62 @@ export const StreakWidget = ({ className }: { className?: string }) => {
                 whileTap={{ scale: 0.98 }}
                 className={`text-left w-full h-full ${className}`}
             >
-                <GlassCard className="flex flex-col justify-between p-6 group h-full">
-                    {/* Dynamic Background Gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-red-500/5 opacity-50 group-hover:opacity-80 transition-opacity duration-500" />
-
+                <BrutalCard className="flex flex-col justify-between p-8 group h-full">
                     {/* Eyebrow */}
-                    <p className="relative z-10 text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">🔥 Daily Progress</p>
+                    <p className="relative z-10 text-xs font-bold uppercase tracking-widest text-slate-100 mb-3 font-Outfit">🔥 Daily Progress</p>
 
                     {/* Header */}
                     <div className="relative z-10 flex justify-between items-start">
-                        <div className="p-2.5 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-xl border border-orange-500/10 shadow-lg shadow-orange-500/5">
-                            <Flame className="w-5 h-5 text-orange-400 fill-orange-400/20" />
+                        <div className="p-2.5 bg-accent/20 rounded-none border-2 border-accent shadow-[2px_2px_0px_0px_var(--color-accent)]">
+                            <Flame className="w-5 h-5 text-accent fill-accent" />
                         </div>
-                        <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-xs font-medium text-gray-400 backdrop-blur-md flex items-center gap-1">
-                            <TrendingUp className="w-3 h-3" />
+                        <span className="px-3 py-1 bg-transparent border-2 border-white/20 text-xs font-bold text-slate-100 uppercase font-Outfit flex items-center gap-1 shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]">
+                            <TrendingUp className="w-3 h-3 text-primary" />
                             Level {level}
                         </span>
                     </div>
 
                     {/* Streak Counter */}
                     <div className="relative z-10 mt-6">
-                        <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold mb-1">🔥 Daily Streak</p>
+                        <p className="text-[10px] uppercase tracking-widest text-slate-300 font-bold mb-1 font-Outfit">Daily Streak</p>
                         <div className="flex items-baseline gap-1.5">
                             <motion.h3
                                 key={streak}
-                                initial={{ scale: 1.3, color: "#fb923c" }}
-                                animate={{ scale: 1, color: "#ffffff" }}
+                                initial={{ scale: 1.3, color: "var(--color-accent)" }}
+                                animate={{ scale: 1, color: "var(--color-foreground)" }}
                                 transition={{ duration: 0.3 }}
-                                className="text-4xl font-bold tracking-tight"
+                                className="text-5xl font-Outfit font-bold tracking-tight text-accent"
                             >
                                 {streak}
                             </motion.h3>
-                            <span className="text-sm text-gray-500 font-medium">days</span>
+                            <span className="text-sm text-slate-300 font-bold uppercase font-Outfit">days</span>
                         </div>
                     </div>
 
                     {/* XP Progress */}
                     <div className="relative z-10 mt-auto pt-6">
-                        <div className="flex justify-between text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">
+                        <div className="flex justify-between text-[10px] uppercase tracking-wider text-slate-300 font-bold mb-2 font-Outfit">
                             <span>XP Progress</span>
                             <motion.span
                                 key={xp}
-                                initial={{ color: "#6366f1" }}
-                                animate={{ color: "#d1d5db" }}
+                                initial={{ color: "var(--color-primary)" }}
+                                animate={{ color: "var(--color-foreground)" }}
                                 transition={{ duration: 0.5 }}
-                                className="text-gray-300 tabular-nums"
+                                className="text-primary tabular-nums"
                             >
                                 {xp.toLocaleString('en-US')} / {maxXp.toLocaleString('en-US')}
                             </motion.span>
                         </div>
-                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-2 bg-transparent border-2 border-white/20 rounded-none overflow-hidden">
                             <motion.div
-                                className="h-full bg-gradient-to-r from-orange-500 to-red-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]"
+                                className="h-full bg-primary"
                                 initial={false}
                                 animate={{ width: `${progress}%` }}
                                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                             />
                         </div>
                     </div>
-                </GlassCard>
+                </BrutalCard>
             </motion.button>
 
             <AnimatePresence>

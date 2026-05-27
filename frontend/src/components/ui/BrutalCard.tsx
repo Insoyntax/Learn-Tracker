@@ -1,15 +1,16 @@
 import { ReactNode } from "react";
 import { motion, HTMLMotionProps } from "framer-motion";
 
-interface GlassCardProps extends HTMLMotionProps<"div"> {
+interface BrutalCardProps extends HTMLMotionProps<"div"> {
     children: ReactNode;
     className?: string;
     hoverEffect?: boolean;
     onClick?: () => void;
 }
 
-export const GlassCard = ({ children, className = "", hoverEffect = true, onClick, ...props }: GlassCardProps) => {
-    // Replaced Glassmorphism with Neo-Brutalism style for universal application
+export const BrutalCard = ({ children, className = "", hoverEffect = true, onClick, ...props }: BrutalCardProps) => {
+    // Neo-Brutalism uses solid background, sharp 2px borders, and hard drop shadows.
+    // When hovered, the card might shift slightly and the shadow adjust to feel tactile.
     const baseClasses = `
         bg-card relative overflow-hidden border-2 border-white/20
         shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)]

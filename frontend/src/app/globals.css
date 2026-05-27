@@ -3,23 +3,25 @@
 @theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-Outfit: var(--font-outfit);
+  --font-Inter: var(--font-inter);
 
-  --color-background: #000000;
-  --color-foreground: #ededed;
+  --color-background: #111111;
+  --color-foreground: #f8fafc;
 
-  --color-card: #0a0a0a;
-  --color-card-foreground: #ffffff;
+  --color-card: #191A1B;
+  --color-card-foreground: #f8fafc;
 
-  --color-primary: var(--accent-color);
-  --color-primary-foreground: #ffffff;
+  --color-primary: #CFFF04;
+  --color-primary-foreground: #000000;
 
-  --color-accent: var(--accent-color);
-  --color-accent-foreground: #ffffff;
+  --color-accent: #F59E0B;
+  --color-accent-foreground: #000000;
 
-  --color-muted: #171717;
-  --color-muted-foreground: #a3a3a3;
+  --color-muted: #222222;
+  --color-muted-foreground: #94a3b8;
 
-  --color-border: #262626;
+  --color-border: rgba(255, 255, 255, 0.2);
 
   --radius-lg: 0.75rem;
   --radius-md: 0.5rem;
