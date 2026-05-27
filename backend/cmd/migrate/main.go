@@ -23,7 +23,7 @@ func main() {
 	}
 	defer pool.Close()
 
-	sqlBytes, err := os.ReadFile("migrations/001_phase2.sql")
+	sqlBytes, err := os.ReadFile("migrations/003_custom_credentials.sql")
 	if err != nil {
 		log.Fatalf("Failed to read migration file: %v", err)
 	}

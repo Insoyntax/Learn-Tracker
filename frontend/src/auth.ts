@@ -18,6 +18,8 @@ import GitHub from "next-auth/providers/github";
 import { SignJWT, jwtVerify } from "jose";
 import type { JWT } from "next-auth/jwt";
 
+import Credentials from "next-auth/providers/credentials";
+
 // ─── Shared Secret ──────────────────────────────────────────────────────────
 // AUTH_SECRET must be the same value in both Next.js (.env.local) and Go (.env).
 // Minimum 32 characters recommended for HS256 security.
@@ -76,10 +78,54 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     maxAge: 30 * 24 * 60 * 60, // 30 days, matches the JWT expiry above
   },
 
-  // OAuth providers — configure via env vars:
-  //   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
-  //   GITHUB_ID, GITHUB_SECRET  (Auth.js auto-reads these names)
-  providers: [Google, GitHub],
+  providers: [
+    Credentials({
+      name: "Credentials",
+      credentials: {
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) {
+          return null;
+        }
+
+        try {
+          const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+          const res = await fetch(`${apiURL}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: credentials.username,
+              password: credentials.password,
+            }),
+          });
+
+          if (!res.ok) {
+            return null;
+          }
+
+          const responseData = await res.json();
+          if (responseData.status === "success" && responseData.data) {
+            const userData = responseData.data.user;
+            return {
+              id: String(userData.id),
+              name: userData.name,
+              email: userData.email,
+              image: null,
+              username: userData.username,
+              school: userData.school,
+              birthdate: userData.birthdate,
+            };
+          }
+          return null;
+        } catch (error) {
+          console.error("Authorize error:", error);
+          return null;
+        }
+      }
+    })
+  ],
 
   // Override JWT encode/decode to use standard HS256 instead of JWE
   jwt: {

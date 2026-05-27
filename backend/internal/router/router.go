@@ -34,6 +34,8 @@ func New(cfg *config.Config) http.Handler {
 	// ── Public routes (no auth required) ────────────────────────────────────
 	mux.HandleFunc("GET /{$}", handlers.Root)
 	mux.HandleFunc("GET /health", handlers.HealthCheck)
+	mux.HandleFunc("POST /api/v1/auth/signup", handlers.Register)
+	mux.HandleFunc("POST /api/v1/auth/login", handlers.Login)
 
 	// ── Protected API routes ────────────────────────────────────────────────
 	// All /api/v1/* routes require a valid JWT token.
