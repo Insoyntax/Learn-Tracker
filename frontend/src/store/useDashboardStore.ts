@@ -688,13 +688,13 @@ export const useDashboardStore = create<DashboardState>()(
             fetchInitialData: async () => {
                 try {
                     const [projects, flashcards, inventoryItems, quests, studioTasks, dashboardLayout, familiarState] = await Promise.all([
-                        api.get('/projects/'),
-                        api.get('/flashcards/'),
-                        api.get('/inventory/'),
-                        api.get('/quests/'),
-                        api.get('/studio/'),
-                        api.get('/dashboard/layout/'),
-                        api.get('/familiar/')
+                        api.get('/projects'),
+                        api.get('/flashcards'),
+                        api.get('/inventory'),
+                        api.get('/quests'),
+                        api.get('/studio'),
+                        api.get('/dashboard/layout'),
+                        api.get('/familiar')
                     ]);
 
                     const currentStats = get().userStats;
@@ -813,7 +813,7 @@ export const useDashboardStore = create<DashboardState>()(
                     ];
 
                     const newQuestsResponses = await Promise.all(
-                        payloads.map(payload => api.post<any>('/quests/', payload))
+                        payloads.map(payload => api.post<any>('/quests', payload))
                     );
 
                     const newQuests: Quest[] = newQuestsResponses.map(res => ({
@@ -852,7 +852,7 @@ export const useDashboardStore = create<DashboardState>()(
                         category_id: parseInt(data.categoryId, 10) || 1, // Fallback safely
                     };
 
-                    const response = await api.post<any>('/flashcards/', payload);
+                    const response = await api.post<any>('/flashcards', payload);
 
                     const newCard: Flashcard = {
                         id: String(response.id),
@@ -972,7 +972,7 @@ export const useDashboardStore = create<DashboardState>()(
                         content: data.content,
                         category_id: parseInt(data.categoryId, 10) || 1,
                     };
-                    const response = await api.post<any>('/inventory/', payload);
+                    const response = await api.post<any>('/inventory', payload);
 
                     const newItem: InventoryItem = {
                         id: String(response.id),
@@ -1021,7 +1021,7 @@ export const useDashboardStore = create<DashboardState>()(
                         category_id: parseInt(data.categoryId, 10) || 1,
                         status: 'TODO'
                     };
-                    const response = await api.post<any>('/studio/', payload);
+                    const response = await api.post<any>('/studio', payload);
 
                     const newTask: StudioTask = {
                         id: String(response.id),
@@ -1115,7 +1115,7 @@ export const useDashboardStore = create<DashboardState>()(
             updateLayout: async (layout) => {
                 set({ layout }); // Optimistically update since Grid relies on rapid updates
                 try {
-                    await api.put('/dashboard/layout/', { layout_data: JSON.stringify(layout) });
+                    await api.put('/dashboard/layout', { layout_data: JSON.stringify(layout) });
                 } catch (error) {
                     console.error("Failed to save layout to DB", error);
                 }
