@@ -91,34 +91,37 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         try {
-          const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-          const res = await fetch(`${apiURL}/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              username: credentials.username,
-              password: credentials.password,
-            }),
-          });
+          const { getDb } = await import("@/lib/db");
+          const bcrypt = await import("bcryptjs");
 
-          if (!res.ok) {
-            return null;
-          }
+          const sql = getDb();
+          const username = String(credentials.username);
+          const rows = await sql`
+            SELECT id, name, email, username, password_hash, school, birthdate
+            FROM users WHERE username = ${username}`;
 
-          const responseData = await res.json();
-          if (responseData.status === "success" && responseData.data) {
-            const userData = responseData.data.user;
-            return {
-              id: String(userData.id),
-              name: userData.name,
-              email: userData.email,
-              image: null,
-              username: userData.username,
-              school: userData.school,
-              birthdate: userData.birthdate,
-            };
-          }
-          return null;
+          if (rows.length === 0) return null;
+
+          const user = rows[0] as {
+            id: number; name: string | null; email: string;
+            username: string; password_hash: string | null;
+            school: string | null; birthdate: string | null;
+          };
+
+          if (!user.password_hash) return null; // OAuth-only account
+
+          const isValid = await bcrypt.compare(
+            credentials.password as string,
+            user.password_hash
+          );
+          if (!isValid) return null;
+
+          return {
+            id: String(user.id),
+            name: user.name,
+            email: user.email,
+            image: null,
+          };
         } catch (error) {
           console.error("Authorize error:", error);
           return null;

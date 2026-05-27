@@ -69,8 +69,7 @@ export default function LoginPage() {
     const loadToast = toast.loading("Mendaftarkan akun baru...");
 
     try {
-      const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-      const res = await fetch(`${apiURL}/auth/signup`, {
+      const res = await fetch(`/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
