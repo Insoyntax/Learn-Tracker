@@ -1,0 +1,17 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000",
+  "executionArgs": {
+    "projectName": "LearnTracker",
+    "projectPath": "e:/Latihan_Antigravity/LearnTracker",
+    "testIds": [],
+    "additionalInstruction": "",
+    "envs": {
+      "API_KEY": "sk-user-qwcXh64Z4xQCYqNbBIXL8IW9WEc0Kyoaz6RDoI3CCNXP66Af4VtQ0A210WQI-0UN-ItEA-Hn-Wf9lghp5qJXCUuOwX1LK0EprXqtMmXo-cb714Z06maaons8Y-mhuvngMlA"
+    }
+  },
+  "serverPort": 62476,
+  "proxy": "http://d46234c4-7376-4705-b32f-021b6742951c:O5q6y4YlV1DeZHbz7q2F2kiBgoIeNk8C@tun.testsprite.com:8080"
+}

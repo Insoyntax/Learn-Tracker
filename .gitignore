@@ -1,0 +1,35 @@
+# Logs
+*.log
+testsprite_output.log
+
+# Databases & local files
+*.db
+*.sqlite
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Executables & Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+backend/server
+
+# Node.js / Frontend dependencies & build outputs
+**/node_modules/
+**/out/
+**/.next/
+**/.vercel/
+**/*.tsbuildinfo
+
+# Sensitive environment variables (MUST BE IGNORED)
+**/.env
+**/.env.local
+**/.env.production
+**/.env.development
+**/.env.test
+**/*.env
+**/*.env.local

@@ -1,0 +1,131 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e6]: L
+        - generic [ref=e7]: Learn Tracker
+      - navigation [ref=e8]:
+        - link "Dashboard" [ref=e9] [cursor=pointer]:
+          - /url: /
+          - img [ref=e11]
+          - generic [ref=e14]: Dashboard
+          - img [ref=e15]
+        - link "Creator Studio" [ref=e17] [cursor=pointer]:
+          - /url: /studio
+          - img [ref=e18]
+          - generic [ref=e23]: Creator Studio
+        - link "Tavern Quests" [ref=e24] [cursor=pointer]:
+          - /url: /quests
+          - img [ref=e25]
+          - generic [ref=e30]: Tavern Quests
+        - link "Inventory" [ref=e31] [cursor=pointer]:
+          - /url: /inventory
+          - img [ref=e32]
+          - generic [ref=e35]: Inventory
+        - link "Skill Tree" [ref=e36] [cursor=pointer]:
+          - /url: /skills
+          - img [ref=e37]
+          - generic [ref=e41]: Skill Tree
+        - link "Flashcards" [ref=e42] [cursor=pointer]:
+          - /url: /flashcards
+          - img [ref=e43]
+          - generic [ref=e51]: Flashcards
+        - link "Roadmaps" [ref=e52] [cursor=pointer]:
+          - /url: /roadmaps
+          - img [ref=e53]
+          - generic [ref=e55]: Roadmaps
+        - link "Resources" [ref=e56] [cursor=pointer]:
+          - /url: /resources
+          - img [ref=e57]
+          - generic [ref=e59]: Resources
+        - link "Study Logs" [ref=e60] [cursor=pointer]:
+          - /url: /logs
+          - img [ref=e61]
+          - generic [ref=e64]: Study Logs
+      - generic [ref=e65]:
+        - link "Settings" [ref=e66] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e67]
+          - generic [ref=e70]: Settings
+        - generic [ref=e73]:
+          - generic [ref=e74]: Student
+          - generic [ref=e75]: Pro Plan
+    - main [ref=e76]:
+      - generic [ref=e77]:
+        - generic [ref=e79]:
+          - heading "Dashboard" [level=1] [ref=e80]
+          - paragraph [ref=e81]:
+            - text: Welcome back, Student. You're on a
+            - generic [ref=e82]: 0-day streak
+            - text: at
+            - generic [ref=e83]: Level 1
+            - text: .
+        - generic [ref=e84]:
+          - button "Edit Dashboard" [ref=e86]:
+            - img [ref=e87]
+            - text: Edit Dashboard
+          - generic [ref=e93]:
+            - button "🔥 Daily Progress Level 1 🔥 Daily Streak 0 days XP Progress 0 / 500" [ref=e97]:
+              - generic [ref=e98]:
+                - paragraph [ref=e100]: 🔥 Daily Progress
+                - generic [ref=e101]:
+                  - img [ref=e103]
+                  - generic [ref=e105]:
+                    - img [ref=e106]
+                    - text: Level 1
+                - generic [ref=e109]:
+                  - paragraph [ref=e110]: 🔥 Daily Streak
+                  - generic [ref=e111]:
+                    - heading "0" [level=3] [ref=e112]
+                    - generic [ref=e113]: days
+                - generic [ref=e115]:
+                  - generic [ref=e116]: XP Progress
+                  - generic [ref=e117]: 0 / 500
+            - generic [ref=e124]:
+              - img [ref=e125]
+              - paragraph [ref=e127]: No active roadmap selected.
+            - generic [ref=e132]:
+              - generic [ref=e133]:
+                - button "Select Category" [ref=e135]:
+                  - generic [ref=e136]: Select Category
+                  - img [ref=e137]
+                - img [ref=e140]
+              - generic [ref=e143]:
+                - paragraph [ref=e144]: Focus Timer
+                - generic [ref=e145]: 00:00
+                - paragraph [ref=e146]: Focus Session
+              - button [ref=e148]:
+                - img [ref=e149]
+            - generic [ref=e155]:
+              - generic [ref=e156]:
+                - img [ref=e158]
+                - heading "ACTIVE BOUNTIES" [level=3] [ref=e163]
+              - generic [ref=e164]:
+                - generic:
+                  - paragraph [ref=e169]: No active bounties.
+                  - link "Visit Quest Board" [ref=e170] [cursor=pointer]:
+                    - /url: /quests
+              - link "View All Bounties" [ref=e172] [cursor=pointer]:
+                - /url: /quests
+                - text: View All Bounties
+                - img [ref=e173]
+            - generic [ref=e179]:
+              - paragraph [ref=e180]: ✍️ Quick Jots
+              - generic [ref=e181]:
+                - generic [ref=e182]:
+                  - img [ref=e184]
+                  - heading "📝 Quick Notes" [level=3] [ref=e189]
+                - button "AI Assist" [ref=e191]:
+                  - img [ref=e192]
+                  - generic [ref=e195]: AI Assist
+              - textbox "# jot down ideas..." [ref=e196]
+              - generic [ref=e197]:
+                - generic [ref=e198]: markdown supported
+                - generic [ref=e199]: 0 chars
+  - button "Open Next.js Dev Tools" [ref=e206] [cursor=pointer]:
+    - img [ref=e207]
+  - alert [ref=e210]
+```
