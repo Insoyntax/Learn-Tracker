@@ -1,7 +1,6 @@
 import { getClientToken } from "@/lib/auth-helpers";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const BASE_URL = "/api";
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;

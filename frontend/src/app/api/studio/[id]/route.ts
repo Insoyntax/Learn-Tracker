@@ -12,11 +12,19 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const body = await request.json();
     const { status } = body;
     const sql = getDb();
+    
+    const uppercaseStatus = String(status).toUpperCase();
     const rows = await sql`
-      UPDATE studio_tasks SET status = ${status} WHERE id = ${taskId} AND user_id = ${userId}
+      UPDATE studio_tasks SET status = ${uppercaseStatus} WHERE id = ${taskId} AND user_id = ${userId}
       RETURNING id, title, description, status, category_id, user_id, created_at`;
+      
     if (rows.length === 0) return err("NOT_FOUND", "Task not found", 404);
-    return ok(rows[0]);
+    
+    const normalized = {
+      ...rows[0],
+      status: String(rows[0].status).toUpperCase()
+    };
+    return ok(normalized);
   } catch (e) { return err("DB_ERROR", String(e), 500); }
 }
 
