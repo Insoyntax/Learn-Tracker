@@ -69,10 +69,10 @@ graph TB
 
 ### Design System
 
-- **Theme:** Dark mode with glassmorphism aesthetic
-- **Base Component:** `GlassCard` — translucent cards with backdrop blur, subtle borders, and hover elevation
+- **Theme:** Neo-Brutalism Dark Mode
+- **Base Component:** `BrutalCard` (aliased as `GlassCard` for compatibility) — solid black cards with thick hard borders border-2 border-white/20, vibrant neon accents (#CFFF04, #F59E0B), hard shadow offset, and Outfit/Inter typography
 - **Layout:** Responsive Bento Grid (1-col mobile → 4-col desktop)
-- **Animations:** Staggered entry with Framer Motion (`opacity + translateY`)
+- **Animations:** Staggered entry and tactile clicks with Framer Motion
 
 ---
 
@@ -149,7 +149,7 @@ erDiagram
 
 ### 5.1 Bento Grid Dashboard
 
-The main interface uses a **Bento-style grid layout** that arranges widgets in a visually dynamic, card-based grid. Each widget is wrapped in a `GlassCard` with glassmorphism styling.
+The main interface uses a **Bento-style grid layout** that arranges widgets in a visually dynamic, card-based grid. Each widget is wrapped in a `BrutalCard` (utilizing `GlassCard`) styled with bold borders and hard shadows.
 
 | Widget          | Grid Span       | Purpose                                   |
 | --------------- | --------------- | ----------------------------------------- |
@@ -312,7 +312,7 @@ LearnTracker/
     │   │   └── globals.css              # Custom visual layout layer
     │   ├── components/                  # Premium UI components
     │   │   ├── studio/                  # Kanban KanbanColumn and AddTaskModal
-    │   │   └── ui/                      # Shared premium GlassCard
+    │   │   └── ui/                      # Shared premium BrutalCard
     │   ├── lib/
     │   │   ├── api.ts                   # Relative path API fetch wrapper
     │   │   ├── api-helpers.ts           # Standardized ok/err wrappers & session checks
@@ -330,7 +330,7 @@ LearnTracker/
 - [x] Project scaffolding (Next.js Standalone Monorepo)
 - [x] Database schema design in Neon
 - [x] Bento Grid dashboard layout
-- [x] GlassCard design system component
+- [x] BrutalCard / Neo-Brutalism design system components
 - [x] All 5 main dashboard widgets (Streak, Roadmap, Timer, Daily Goals, Quick Note)
 
 ### Phase 2 — Core Functionality ✅

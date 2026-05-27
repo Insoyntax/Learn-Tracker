@@ -200,11 +200,14 @@ sequenceDiagram
 
 ## 🎨 4. Frontend Design System & Client State
 
-Antarmuka dibangun dengan estetika **Premium Dark Gamified Dashboard UI**:
-* **UI Framework:** Tailwind CSS dengan kustomisasi font Google Fonts Outfit & Inter.
-* **Animasi:** Framer Motion untuk transisi halus antar-halaman, modal, dan micro-interactions pada tombol gamifikasi.
-* **Kanban Drag & Drop:** `@dnd-kit/core` & `@dnd-kit/sortable` untuk fungsionalitas drag-and-drop antar kolom yang sangat mulus dengan sistem state bayangan lokal sebelum di-commit secara pesimis ke database.
-* **State Management:** **Zustand** dengan integrasi middleware `persist` untuk penyimpanan lokal sementara dan pembaruan data real-time asinkron ke server.
+Antarmuka dibangun dengan estetika **Neo-Brutalism Dark Mode**:
+* **UI Framework:** Tailwind CSS v4 dengan integrasi font Google Fonts `Outfit` (untuk heading/aksen uppercase) dan `Inter` (untuk teks deskripsi/body).
+* **Desain Kartu:** `BrutalCard` (terintegrasi melalui `GlassCard`) dengan warna solid dark (`#191A1B`), border hitam/putih tegas ketebalan 2px (`border-2 border-white/20`), shadow kaku/blok (`shadow-[4px_4px_0px_0px]`), dan tanpa opacity atau backdrop-blur.
+* **Aksen Dopamin & Gamifikasi:** Menggunakan warna-warna neon mencolok dengan kontras sangat tinggi seperti Neon Green (`#CFFF04`) dan Dragon Gold (`#F59E0B`) sebagai aksen utama untuk timer, XP/level bar, dan status streak.
+* **Doodle Line-Art Empty States:** Menggunakan ilustrasi SVG line-art bertema blueprint untuk area kosong pada widget guna menghadirkan estetika "raw" yang memicu produktivitas tinggi.
+* **Animasi & Interaksi:** Framer Motion untuk transisi halaman, modal, micro-animations pada tombol gamifikasi (misal animasi detak, tap scaling, dan gelembung balon percakapan virtual familiar).
+* **Kanban Drag & Drop:** `@dnd-kit/core` & `@dnd-kit/sortable` untuk fungsionalitas drag-and-drop tugas kanban secara presisi dengan representasi bayangan lokal.
+* **State Management:** **Zustand** global store dengan integrasi sinkronisasi API asinkron.
 
 ---
 
