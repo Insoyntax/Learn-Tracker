@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BrutalCard } from "@/components/ui/BrutalCard";
+import { SpatialCard } from "@/components/ui/SpatialCard";
 import { Map, CheckSquare, Square, Trophy, RotateCcw } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import confetti from "canvas-confetti";
@@ -83,32 +83,28 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
 
     if (!activeRoadmap) {
         return (
-            <BrutalCard className={`p-8 flex items-center justify-center relative overflow-hidden ${className}`}>
-                {/* SVG Line-art Doodle Background */}
-                <div className="absolute inset-0 opacity-20 pointer-events-none flex items-center justify-center">
-                    <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M40 40 L160 40 L160 160 L40 160 Z" stroke="white" strokeWidth="2" strokeDasharray="5 5" />
-                        <circle cx="100" cy="100" r="40" stroke="white" strokeWidth="2" />
-                        <path d="M100 20 L100 180" stroke="white" strokeWidth="2" />
-                        <path d="M20 100 L180 100" stroke="white" strokeWidth="2" />
-                        <circle cx="160" cy="40" r="4" fill="var(--color-primary)" />
-                        <circle cx="40" cy="160" r="4" fill="var(--color-accent)" />
+            <SpatialCard className={`p-8 flex items-center justify-center relative overflow-hidden ${className}`} glowColor="rgba(56,189,248,0.08)">
+                <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
+                    <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
+                        <circle cx="100" cy="100" r="70" stroke="rgba(56,189,248,0.5)" strokeWidth="1" strokeDasharray="4 6" />
+                        <circle cx="100" cy="100" r="40" stroke="rgba(167,139,250,0.4)" strokeWidth="1" />
+                        <path d="M100 30 L100 170" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+                        <path d="M30 100 L170 100" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+                        <circle cx="100" cy="100" r="6" fill="rgba(56,189,248,0.4)" />
                     </svg>
                 </div>
-                
                 <div className="text-center relative z-10">
-                    <Map className="w-8 h-8 text-slate-100 mx-auto mb-4" />
-                    <p className="text-slate-100 text-lg font-Outfit font-bold">No active roadmap</p>
-                    <p className="text-slate-400 text-sm font-Inter mt-1">Select one to begin tracking.</p>
+                    <Map className="w-8 h-8 text-white/30 mx-auto mb-3" />
+                    <p className="text-white/60 text-base font-medium">No active roadmap</p>
+                    <p className="text-white/25 text-sm mt-1">Select one to begin tracking.</p>
                 </div>
-            </BrutalCard>
+            </SpatialCard>
         );
     }
 
     return (
-        <BrutalCard className={`p-8 relative flex flex-col ${className}`}>
-            {/* Eyebrow */}
-            <p className="relative z-10 text-xs font-bold uppercase tracking-widest text-slate-100 mb-3 font-Outfit">🗺️ Active Roadmap</p>
+        <SpatialCard className={`p-6 relative flex flex-col ${className}`} glowColor="rgba(56,189,248,0.08)">
+            <p className="relative z-10 text-white/30 text-[10px] tracking-widest uppercase mb-4">Active Roadmap</p>
 
             <AnimatePresence mode="wait">
                 {showSuccess ? (
@@ -129,14 +125,15 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                             <Trophy className="w-16 h-16 text-accent drop-shadow-md" />
                         </motion.div>
                         <div className="text-center">
-                            <h3 className="text-2xl font-bold text-white mb-1 font-Outfit">Path Mastered! 🏆</h3>
-                            <p className="text-sm text-slate-400 font-Inter">You completed all steps in {title}</p>
+                            <h3 className="text-2xl font-semibold text-white mb-1">Path Mastered! 🏆</h3>
+                            <p className="text-sm text-white/40 mt-1">You completed all steps in {title}</p>
                         </div>
                         <motion.button
-                            whileHover={{ scale: 1.05, boxShadow: "4px 4px 0px 0px var(--color-accent)" }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.04 }}
+                            whileTap={{ scale: 0.96 }}
                             onClick={handleReset}
-                            className="flex items-center gap-2 px-6 py-3 border-2 border-accent bg-transparent text-accent text-sm font-bold font-Outfit uppercase transition-all shadow-[2px_2px_0px_0px_var(--color-accent)]"
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium text-sky-400 transition-all"
+                            style={{ background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.25)" }}
                         >
                             <RotateCcw className="w-4 h-4" />
                             Choose Next Path
@@ -153,71 +150,77 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between mb-5">
-                            <div className="flex items-center gap-4">
-                                <div className="p-2.5 border-2 border-white/20 bg-transparent shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]">
-                                    <Map className="w-5 h-5 text-slate-100" />
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-xl" style={{ background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.15)" }}>
+                                    <Map className="w-4 h-4 text-sky-400" />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-white tracking-tight font-Outfit">📍 {title}</h3>
-                                    <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase font-Outfit mt-1">{category}</p>
+                                    <h3 className="text-sm font-semibold text-white tracking-tight">{title}</h3>
+                                    <p className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">{category}</p>
                                 </div>
                             </div>
-                            <motion.span
-                                key={safeProgress}
-                                initial={{ scale: 1.2, color: "var(--color-primary)" }}
-                                animate={{ scale: 1, color: "var(--color-foreground)" }}
-                                className="text-xs font-Outfit font-bold border-2 border-white/20 px-2 py-1 shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] tabular-nums"
+                            <span
+                                className="text-xs font-medium px-2.5 py-1 rounded-full tabular-nums text-sky-400"
+                                style={{ background: "rgba(56,189,248,0.08)", border: "1px solid rgba(56,189,248,0.15)" }}
                             >
                                 {safeProgress}%
-                            </motion.span>
+                            </span>
                         </div>
 
                         {/* Progress bar */}
-                        <div className="h-2 bg-transparent border-2 border-white/20 overflow-hidden mb-6">
+                        <div className="h-1 rounded-full overflow-hidden mb-5" style={{ background: "rgba(255,255,255,0.04)" }}>
                             <motion.div
-                                className="h-full bg-primary"
+                                className="h-full rounded-full"
+                                style={{ background: "linear-gradient(90deg, #38bdf8, #a78bfa)", boxShadow: "0 0 8px rgba(56,189,248,0.4)" }}
                                 initial={false}
                                 animate={{ width: `${safeProgress}%` }}
                                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                             />
                         </div>
 
-                        {/* Steps list */}
-                        <div className="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                        {/* Steps list — Glowing Timeline */}
+                        <div className="relative space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                            {/* Timeline line */}
+                            <div className="absolute left-4 top-4 bottom-4 w-px" style={{ background: "linear-gradient(to bottom, rgba(56,189,248,0.4), rgba(167,139,250,0.2), transparent)" }} />
+
                             {steps.map((step, idx) => (
                                 <motion.button
                                     key={step.id}
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: idx * 0.08 + 0.15 }}
+                                    transition={{ delay: idx * 0.05 }}
                                     onClick={() => handleToggle(step.id)}
-                                    className={`
-                                        group w-full flex items-center gap-3 p-4 border-2 transition-all duration-200 text-left
-                                        ${step.isCompleted
-                                            ? "border-primary/50 bg-primary/5"
-                                            : "border-white/20 bg-transparent hover:border-white/50 hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] hover:-translate-y-0.5"
-                                        }
-                                    `}
+                                    className="group w-full flex items-center gap-4 text-left"
                                 >
-                                    <motion.div
-                                        initial={false}
-                                        animate={{ scale: step.isCompleted ? [1.3, 1] : 1 }}
-                                        transition={{ duration: 0.2 }}
+                                    {/* Timeline node */}
+                                    <div
+                                        className="shrink-0 w-8 h-8 rounded-full z-10 flex items-center justify-center transition-all duration-300"
+                                        style={step.isCompleted ? {
+                                            background: "rgba(52,211,153,0.15)",
+                                            border: "1px solid rgba(52,211,153,0.4)",
+                                            boxShadow: "0 0 12px rgba(52,211,153,0.3)",
+                                        } : {
+                                            background: "rgba(255,255,255,0.04)",
+                                            border: "1px solid rgba(255,255,255,0.1)",
+                                        }}
                                     >
-                                        {step.isCompleted ? (
-                                            <CheckSquare className="w-5 h-5 text-primary shrink-0" />
-                                        ) : (
-                                            <Square className="w-5 h-5 text-slate-400 group-hover:text-slate-100 shrink-0 transition-colors" />
-                                        )}
-                                    </motion.div>
+                                        {step.isCompleted
+                                            ? <CheckSquare className="w-3.5 h-3.5 text-emerald-400" />
+                                            : <Square className="w-3.5 h-3.5 text-white/20 group-hover:text-white/50 transition-colors" />
+                                        }
+                                    </div>
 
-                                    <span className={`text-sm font-Inter font-medium transition-colors ${step.isCompleted ? "text-slate-500 line-through decoration-slate-500" : "text-slate-200"}`}>
-                                        {step.title}
-                                    </span>
-
-                                    <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <span className="text-[10px] font-Outfit font-bold border-2 border-white/20 px-2 py-0.5 text-slate-300">
-                                            {step.isCompleted ? "Undo" : "+50 XP"}
+                                    {/* Step content */}
+                                    <div
+                                        className="flex-1 min-w-0 p-3 rounded-xl transition-all duration-200 group-hover:bg-white/[0.03]"
+                                        style={{ border: "1px solid rgba(255,255,255,0.04)" }}
+                                    >
+                                        <span className={`text-xs font-medium transition-colors ${
+                                            step.isCompleted
+                                                ? "text-white/25 line-through"
+                                                : "text-white/70 group-hover:text-white/90"
+                                        }`}>
+                                            {step.title}
                                         </span>
                                     </div>
                                 </motion.button>
@@ -226,6 +229,6 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </BrutalCard>
+        </SpatialCard>
     );
 };

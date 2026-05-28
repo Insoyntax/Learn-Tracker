@@ -1,85 +1,169 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { BrutalCard } from "@/components/ui/BrutalCard";
+import { SpatialCard } from "@/components/ui/SpatialCard";
 import { Flame, TrendingUp } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { StreakDetailModal } from "./StreakDetailModal";
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
+
+/** Generate a 7×8 (56 cells) mock activity matrix from today going back */
+function buildHeatmapGrid(streak: number): Array<{ active: boolean; intensity: number }> {
+    const cells = Array.from({ length: 56 }, (_, i) => {
+        const daysAgo = 55 - i;
+        const isInStreak = daysAgo < streak;
+        const randomFill = Math.random();
+
+        if (isInStreak) {
+            return { active: true, intensity: 0.5 + randomFill * 0.5 };
+        }
+        return { active: randomFill > 0.6, intensity: randomFill * 0.4 };
+    });
+    return cells;
+}
 
 export const StreakWidget = ({ className }: { className?: string }) => {
     const userStats = useDashboardStore((s) => s.userStats);
     const xp = userStats?.xp ?? 0;
-    const maxXp = userStats?.maxXp ?? 100;
+    const maxXp = userStats?.maxXp ?? 500;
     const level = userStats?.level ?? 1;
     const streak = userStats?.streak ?? 0;
+    const xpByCategory = userStats?.xpByCategory ?? {};
     const progress = Math.min((xp / Math.max(maxXp, 1)) * 100, 100);
+
     const [showModal, setShowModal] = useState(false);
+
+    const heatmap = useMemo(() => buildHeatmapGrid(streak), [streak]);
+
+    // Radar data from xpByCategory (top 5)
+    const radarData = useMemo(() => {
+        const entries = Object.entries(xpByCategory).slice(0, 6);
+        if (entries.length === 0) {
+            return [
+                { subject: "Code", A: 40 },
+                { subject: "Math", A: 25 },
+                { subject: "Lang", A: 60 },
+                { subject: "Design", A: 30 },
+                { subject: "Science", A: 50 },
+            ];
+        }
+        const max = Math.max(...entries.map(([, v]) => v), 1);
+        return entries.map(([k, v]) => ({
+            subject: k.slice(0, 6),
+            A: Math.round((v / max) * 100),
+        }));
+    }, [xpByCategory]);
 
     return (
         <>
             <motion.button
                 onClick={() => setShowModal(true)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
                 className={`text-left w-full h-full ${className}`}
+                whileTap={{ scale: 0.99 }}
             >
-                <BrutalCard className="flex flex-col justify-between p-8 group h-full">
-                    {/* Eyebrow */}
-                    <p className="relative z-10 text-xs font-bold uppercase tracking-widest text-slate-100 mb-3 font-Outfit">🔥 Daily Progress</p>
-
-                    {/* Header */}
-                    <div className="relative z-10 flex justify-between items-start">
-                        <div className="p-2.5 bg-accent/20 rounded-none border-2 border-accent shadow-[2px_2px_0px_0px_var(--color-accent)]">
-                            <Flame className="w-5 h-5 text-accent fill-accent" />
+                <SpatialCard
+                    className="flex flex-col justify-between p-6 h-full"
+                    glowColor="rgba(251, 146, 60, 0.12)"
+                    magnetic={false}
+                >
+                    {/* ── Header ── */}
+                    <div className="flex items-start justify-between mb-4">
+                        <div>
+                            <p className="text-white/40 text-[10px] tracking-widest uppercase mb-1">Daily Progress</p>
+                            <div className="flex items-baseline gap-2">
+                                <h3 className="text-4xl font-semibold text-white tabular-nums">{streak}</h3>
+                                <span className="text-white/30 text-sm">day streak</span>
+                            </div>
                         </div>
-                        <span className="px-3 py-1 bg-transparent border-2 border-white/20 text-xs font-bold text-slate-100 uppercase font-Outfit flex items-center gap-1 shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]">
-                            <TrendingUp className="w-3 h-3 text-primary" />
-                            Level {level}
-                        </span>
-                    </div>
 
-                    {/* Streak Counter */}
-                    <div className="relative z-10 mt-6">
-                        <p className="text-[10px] uppercase tracking-widest text-slate-300 font-bold mb-1 font-Outfit">Daily Streak</p>
-                        <div className="flex items-baseline gap-1.5">
-                            <motion.h3
-                                key={streak}
-                                initial={{ scale: 1.3, color: "var(--color-accent)" }}
-                                animate={{ scale: 1, color: "var(--color-foreground)" }}
-                                transition={{ duration: 0.3 }}
-                                className="text-5xl font-Outfit font-bold tracking-tight text-accent"
+                        <div className="flex flex-col items-end gap-2">
+                            {/* Level badge */}
+                            <div
+                                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium"
+                                style={{
+                                    background: "rgba(56,189,248,0.1)",
+                                    border: "1px solid rgba(56,189,248,0.2)",
+                                    color: "#38bdf8",
+                                }}
                             >
-                                {streak}
-                            </motion.h3>
-                            <span className="text-sm text-slate-300 font-bold uppercase font-Outfit">days</span>
+                                <TrendingUp className="w-3 h-3" />
+                                Lv {level}
+                            </div>
+                            {/* Flame icon */}
+                            <div
+                                className="p-2 rounded-xl"
+                                style={{
+                                    background: "rgba(251,146,60,0.1)",
+                                    border: "1px solid rgba(251,146,60,0.2)",
+                                }}
+                            >
+                                <Flame className="w-4 h-4 text-orange-400" />
+                            </div>
                         </div>
                     </div>
 
-                    {/* XP Progress */}
-                    <div className="relative z-10 mt-auto pt-6">
-                        <div className="flex justify-between text-[10px] uppercase tracking-wider text-slate-300 font-bold mb-2 font-Outfit">
+                    {/* ── Dot Matrix Heatmap ── */}
+                    <div className="mb-4">
+                        <p className="text-white/25 text-[9px] tracking-widest uppercase mb-2">56-Day Activity</p>
+                        <div className="grid grid-cols-8 gap-1">
+                            {heatmap.map((cell, i) => (
+                                <div
+                                    key={i}
+                                    className="heatmap-dot aspect-square rounded-[3px]"
+                                    style={{
+                                        background: cell.active
+                                            ? `rgba(56, 189, 248, ${0.2 + cell.intensity * 0.8})`
+                                            : "rgba(255,255,255,0.04)",
+                                        boxShadow: cell.active && cell.intensity > 0.7
+                                            ? `0 0 6px rgba(56, 189, 248, ${cell.intensity * 0.4})`
+                                            : "none",
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* ── Radar Chart (Skill Levels) ── */}
+                    <div className="h-24 -mx-2">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="80%">
+                                <PolarGrid stroke="rgba(255,255,255,0.06)" />
+                                <PolarAngleAxis
+                                    dataKey="subject"
+                                    tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 9 }}
+                                />
+                                <Radar
+                                    name="Skills"
+                                    dataKey="A"
+                                    stroke="rgba(56,189,248,0.6)"
+                                    fill="rgba(56,189,248,0.08)"
+                                    strokeWidth={1.5}
+                                />
+                            </RadarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* ── XP Progress Bar ── */}
+                    <div className="mt-4">
+                        <div className="flex justify-between text-[9px] text-white/30 uppercase tracking-widest mb-1.5">
                             <span>XP Progress</span>
-                            <motion.span
-                                key={xp}
-                                initial={{ color: "var(--color-primary)" }}
-                                animate={{ color: "var(--color-foreground)" }}
-                                transition={{ duration: 0.5 }}
-                                className="text-primary tabular-nums"
-                            >
-                                {xp.toLocaleString('en-US')} / {maxXp.toLocaleString('en-US')}
-                            </motion.span>
+                            <span>{xp.toLocaleString()} / {maxXp.toLocaleString()}</span>
                         </div>
-                        <div className="h-2 bg-transparent border-2 border-white/20 rounded-none overflow-hidden">
+                        <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
                             <motion.div
-                                className="h-full bg-primary"
+                                className="h-full rounded-full"
+                                style={{
+                                    background: "linear-gradient(90deg, #38bdf8, #a78bfa)",
+                                    boxShadow: "0 0 8px rgba(56,189,248,0.4)",
+                                }}
                                 initial={false}
                                 animate={{ width: `${progress}%` }}
-                                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             />
                         </div>
                     </div>
-                </BrutalCard>
+                </SpatialCard>
             </motion.button>
 
             <AnimatePresence>

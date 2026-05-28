@@ -2,143 +2,248 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Sparkles } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { Heart, Sparkles, Zap } from "lucide-react";
+import { SpatialCard } from "@/components/ui/SpatialCard";
 
 const QUOTES = [
     "You're doing great!",
-    "Keep that streak burning!",
+    "Keep that streak alive!",
     "Focus is a superpower.",
-    "One step at a time.",
-    "Breathe in, breathe out.",
-    "Let's conquer the day!",
+    "Small steps, big leaps.",
+    "Level up, one day at a time.",
+    "The grind is sacred.",
+    "Your future self thanks you.",
 ];
 
+// ── AmbientOrb Component ────────────────────────────────────────────────────
+interface AmbientOrbProps {
+    hpPercent: number;
+    isClicked: boolean;
+    onInteract: () => void;
+}
+
+const AmbientOrb = ({ hpPercent, isClicked, onInteract }: AmbientOrbProps) => {
+    // Determine orb state
+    const isHealthy = hpPercent > 50;
+    const isDanger = hpPercent <= 20;
+
+    const orbColor = isHealthy
+        ? { primary: "#34d399", secondary: "#38bdf8", glow: "rgba(52, 211, 153, 0.5)" }
+        : isDanger
+            ? { primary: "#f87171", secondary: "#fb923c", glow: "rgba(248, 113, 113, 0.5)" }
+            : { primary: "#fb923c", secondary: "#fbbf24", glow: "rgba(251, 146, 60, 0.4)" };
+
+    const orbScale = isHealthy ? [1, 1.08, 1] : isDanger ? [0.9, 0.95, 0.9] : [1, 1.04, 1];
+    const breatheDuration = isDanger ? 1.5 : 4;
+
+    return (
+        <motion.button
+            onClick={onInteract}
+            className="relative flex items-center justify-center cursor-pointer focus:outline-none"
+            style={{ width: 110, height: 110 }}
+            whileTap={{ scale: 0.92 }}
+        >
+            {/* Outer ambient halo */}
+            <motion.div
+                className="absolute inset-0 rounded-full"
+                animate={{ scale: [1, 1.18, 1], opacity: [0.15, 0.35, 0.15] }}
+                transition={{ duration: breatheDuration * 1.5, repeat: Infinity, ease: "easeInOut" }}
+                style={{
+                    background: `radial-gradient(circle, ${orbColor.glow} 0%, transparent 70%)`,
+                    filter: "blur(12px)",
+                }}
+            />
+
+            {/* Middle ring glow */}
+            <motion.div
+                className="absolute rounded-full"
+                style={{ inset: 12 }}
+                animate={{ scale: [1, 1.12, 1], opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: breatheDuration, repeat: Infinity, ease: "easeInOut" }}
+            >
+                <div
+                    className="w-full h-full rounded-full"
+                    style={{
+                        background: `radial-gradient(circle at 40% 35%, ${orbColor.primary}, ${orbColor.secondary})`,
+                        filter: `blur(16px)`,
+                    }}
+                />
+            </motion.div>
+
+            {/* Core orb sphere */}
+            <motion.div
+                className="relative z-10 rounded-full"
+                style={{ width: 64, height: 64 }}
+                animate={{ scale: orbScale, y: [-3, 3, -3] }}
+                transition={{
+                    scale: { duration: breatheDuration, repeat: Infinity, ease: "easeInOut" },
+                    y: { duration: breatheDuration * 0.8, repeat: Infinity, ease: "easeInOut" },
+                }}
+            >
+                <div
+                    className="w-full h-full rounded-full"
+                    style={{
+                        background: `radial-gradient(circle at 35% 30%, rgba(255,255,255,0.4), ${orbColor.primary} 40%, ${orbColor.secondary} 80%)`,
+                        boxShadow: `
+                            0 0 0 1px rgba(255,255,255,0.15),
+                            0 0 20px ${orbColor.glow},
+                            0 0 60px ${isDanger ? "rgba(248,113,113,0.2)" : "rgba(52,211,153,0.15)"},
+                            inset 0 2px 4px rgba(255,255,255,0.3)
+                        `,
+                    }}
+                />
+                {/* Specular highlight */}
+                <div
+                    className="absolute top-2.5 left-3 w-4 h-2.5 rounded-full opacity-60"
+                    style={{ background: "rgba(255,255,255,0.7)", filter: "blur(4px)" }}
+                />
+            </motion.div>
+
+            {/* Danger pulse ring */}
+            {isDanger && (
+                <motion.div
+                    className="absolute inset-0 rounded-full border"
+                    style={{ borderColor: "rgba(248,113,113,0.4)" }}
+                    animate={{ scale: [1, 1.4], opacity: [0.6, 0] }}
+                    transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut" }}
+                />
+            )}
+        </motion.button>
+    );
+};
+
+// ── Widget ──────────────────────────────────────────────────────────────────
 export const VirtualFamiliarWidget = ({ className }: { className?: string }) => {
-    const familiar = useDashboardStore(s => s.userStats?.familiar);
-    
-    // Securely fall back if data isn't hydrated yet
-    const { currentHp, maxHp, level, lastFedAt } = familiar || { currentHp: 100, maxHp: 100, level: 1, lastFedAt: new Date().toISOString() };
+    const familiar = useDashboardStore((s) => s.userStats?.familiar);
+    const { currentHp, maxHp, level, lastFedAt } = familiar ?? {
+        currentHp: 100, maxHp: 100, level: 1, lastFedAt: new Date().toISOString()
+    };
 
     const [localHp, setLocalHp] = useState(currentHp);
     const [isTalking, setIsTalking] = useState(false);
     const [quote, setQuote] = useState(QUOTES[0]);
+    const [isClicked, setIsClicked] = useState(false);
 
+    // Drain HP over time (1 HP/hour)
     useEffect(() => {
-        const calculateDrain = () => {
-            const lastFedTime = new Date(lastFedAt).getTime();
-            const now = Date.now();
-            const hoursElapsed = (now - lastFedTime) / (1000 * 60 * 60);
-            
-            const deducted = Math.floor(hoursElapsed * 1);
-            const simulatedHp = Math.max(0, currentHp - deducted);
-            setLocalHp(simulatedHp);
+        const drain = () => {
+            const elapsed = (Date.now() - new Date(lastFedAt).getTime()) / 3_600_000;
+            setLocalHp(Math.max(0, currentHp - Math.floor(elapsed)));
         };
-
-        calculateDrain();
-        const interval = setInterval(calculateDrain, 60000);
-        return () => clearInterval(interval);
+        drain();
+        const t = setInterval(drain, 60_000);
+        return () => clearInterval(t);
     }, [currentHp, lastFedAt]);
 
-    const hpPercentage = Math.min((localHp / maxHp) * 100, 100);
+    const hpPercent = Math.min((localHp / Math.max(maxHp, 1)) * 100, 100);
 
-    const hpColor = hpPercentage > 50
-        ? "bg-primary"
-        : hpPercentage > 20
-            ? "bg-accent"
-            : "bg-red-500 animate-pulse";
+    const isHealthy = hpPercent > 50;
+    const isDanger = hpPercent <= 20;
 
-    const handlePetInteract = () => {
+    const hpBarColor = isHealthy
+        ? "linear-gradient(90deg, #34d399, #38bdf8)"
+        : isDanger
+            ? "linear-gradient(90deg, #f87171, #fb923c)"
+            : "linear-gradient(90deg, #fb923c, #fbbf24)";
+
+    const handleInteract = () => {
         if (isTalking) return;
+        setIsClicked(true);
         setQuote(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
         setIsTalking(true);
-
-        setTimeout(() => {
-            setIsTalking(false);
-        }, 3000);
+        setTimeout(() => { setIsTalking(false); setIsClicked(false); }, 2800);
     };
 
     return (
-        <div className={`h-full flex flex-col items-center justify-center p-4 relative bg-card border-2 border-white/20 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] ${className}`}>
+        <SpatialCard
+            className={`h-full flex flex-col items-center justify-between p-6 relative ${className}`}
+            glowColor={
+                isHealthy
+                    ? "rgba(52, 211, 153, 0.1)"
+                    : isDanger
+                        ? "rgba(248, 113, 113, 0.12)"
+                        : "rgba(251, 146, 60, 0.1)"
+            }
+        >
+            {/* Level badge */}
+            <div className="w-full flex items-center justify-between mb-2">
+                <div
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium text-violet-400"
+                    style={{ background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.2)" }}
+                >
+                    <Sparkles className="w-2.5 h-2.5" />
+                    Level {level}
+                </div>
 
-            {/* Top Level indicator */}
-            <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1 bg-transparent border-2 border-accent shadow-[2px_2px_0px_0px_var(--color-accent)]">
-                <Sparkles className="w-3 h-3 text-accent" />
-                <span className="text-[10px] font-Outfit font-bold text-accent uppercase">Lvl {level}</span>
+                {/* Status pill */}
+                <div
+                    className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-medium"
+                    style={{
+                        background: isDanger ? "rgba(248,113,113,0.1)" : "rgba(52,211,153,0.08)",
+                        border: `1px solid ${isDanger ? "rgba(248,113,113,0.25)" : "rgba(52,211,153,0.2)"}`,
+                        color: isDanger ? "#f87171" : "#34d399",
+                    }}
+                >
+                    <span
+                        className={`w-1.5 h-1.5 rounded-full ${isDanger ? "bg-red-400" : "bg-emerald-400"} ${isDanger ? "animate-pulse" : ""}`}
+                    />
+                    {isDanger ? "Critical" : isHealthy ? "Healthy" : "Weakened"}
+                </div>
             </div>
 
             {/* Speech Bubble */}
-            <AnimatePresence>
-                {isTalking && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 5, scale: 0.9 }}
-                        transition={{ type: "spring", bounce: 0.4 }}
-                        className="absolute top-10 bg-white border-2 border-black text-black text-xs font-Inter font-bold px-4 py-2 shadow-[4px_4px_0px_0px_var(--color-primary)] z-20 whitespace-nowrap"
-                    >
-                        {quote}
-                        {/* Brutalism tail */}
-                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-t-[8px] border-t-black border-r-[6px] border-r-transparent"></div>
-                        <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-t-[6px] border-t-white border-r-[4px] border-r-transparent"></div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <div className="relative w-full flex justify-center mb-2" style={{ minHeight: 40 }}>
+                <AnimatePresence>
+                    {isTalking && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                            transition={{ type: "spring", bounce: 0.5 }}
+                            className="px-4 py-2 text-xs font-medium text-white/90 rounded-2xl whitespace-nowrap"
+                            style={{
+                                background: "rgba(255,255,255,0.07)",
+                                backdropFilter: "blur(20px)",
+                                border: "1px solid rgba(255,255,255,0.12)",
+                                boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
+                            }}
+                        >
+                            {quote}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
 
-            {/* The Familiar Avatar (Line-art SVG) */}
-            <motion.button
-                onClick={handlePetInteract}
-                className="relative z-10 w-24 h-24 mt-6 flex items-center justify-center focus:outline-none cursor-pointer group"
-                whileTap={{ scale: 1.1, y: -10 }}
-            >
-                <motion.div
-                    animate={{
-                        y: [-2, 2, -2],
-                        scale: [1, 1.05, 1],
-                    }}
-                    transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
-                    className="w-20 h-20 transition-all"
-                >
-                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[2px_2px_0px_rgba(255,255,255,0.2)]">
-                        {/* Minimalist Tech Blob Body */}
-                        <path d="M20 50 C20 20, 80 20, 80 50 C80 80, 70 90, 50 90 C30 90, 20 80, 20 50 Z" stroke="white" strokeWidth="4" fill="transparent"/>
-                        {/* Eyes */}
-                        <rect x="35" y="45" width="8" height="8" fill="var(--color-primary)" />
-                        <rect x="57" y="45" width="8" height="8" fill="var(--color-primary)" />
-                        {/* Mouth/Glitch */}
-                        <path d="M42 65 L58 65" stroke="white" strokeWidth="4" strokeLinecap="square"/>
-                        {/* Antenna */}
-                        <path d="M50 22 L50 10" stroke="white" strokeWidth="4"/>
-                        <circle cx="50" cy="10" r="4" fill="var(--color-accent)"/>
-                    </svg>
-                </motion.div>
-            </motion.button>
+            {/* Orb */}
+            <AmbientOrb hpPercent={hpPercent} isClicked={isClicked} onInteract={handleInteract} />
 
-            {/* Health Bar UI Container */}
-            <div className="w-full mt-8 space-y-2 z-10">
-                <div className="flex justify-between items-center px-1">
-                    <span className="flex items-center gap-1 text-[10px] font-Outfit font-bold text-slate-100 uppercase">
-                        <Heart className="w-3 h-3 text-red-500 fill-red-500" /> HP
+            {/* HP Bar */}
+            <div className="w-full mt-6 space-y-2">
+                <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-[10px] text-white/40">
+                        <Heart className="w-3 h-3 text-red-400/70" />
+                        HP
                     </span>
-                    <span className="text-[10px] font-Outfit font-bold text-slate-300 tabular-nums">
-                        {localHp} / {maxHp}
-                    </span>
+                    <span className="text-[10px] text-white/30 tabular-nums">{localHp} / {maxHp}</span>
                 </div>
 
-                {/* Visual HP Track */}
-                <div className="h-3 w-full bg-transparent overflow-hidden border-2 border-white/20">
+                <div
+                    className="h-1.5 w-full rounded-full overflow-hidden"
+                    style={{ background: "rgba(255,255,255,0.05)" }}
+                >
                     <motion.div
-                        className={`h-full ${hpColor}`}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${hpPercentage}%` }}
-                        transition={{ type: "spring", stiffness: 50, damping: 15 }}
+                        className="h-full rounded-full"
+                        style={{ background: hpBarColor, boxShadow: `0 0 8px ${isDanger ? "rgba(248,113,113,0.4)" : "rgba(52,211,153,0.3)"}` }}
+                        animate={{ width: `${hpPercent}%` }}
+                        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                     />
                 </div>
+
+                <p className="text-white/20 text-[9px] text-center">
+                    Tap the orb to interact
+                </p>
             </div>
-        </div>
+        </SpatialCard>
     );
 };

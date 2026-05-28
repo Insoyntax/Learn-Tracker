@@ -145,6 +145,10 @@ interface DashboardState {
     isEditMode: boolean;
     availableWidgets: string[];
 
+    // Sidebar / Drawer
+    isSidebarOpen: boolean;
+    toggleSidebar: () => void;
+
     studyTimer: StudyTimer;
     quickNotes: QuickNotes;
     quests: Quest[];
@@ -307,6 +311,10 @@ export const useDashboardStore = create<DashboardState>()(
             layout: DEFAULT_LAYOUT,
             isEditMode: false,
             availableWidgets: INITIAL_WIDGETS,
+
+            // Drawer state
+            isSidebarOpen: false,
+            toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
 
             studyTimer: {
                 isRunning: false,
