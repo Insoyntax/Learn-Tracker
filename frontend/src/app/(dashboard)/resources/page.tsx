@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { GlassCard } from "@/components/ui/GlassCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import {
     BookOpen, Plus, Trash2, CheckCircle2, Circle,
     Filter, ExternalLink, Video, FileText, Github, Link as LinkIcon
@@ -136,7 +136,7 @@ export default function ResourcesPage() {
             {/* Content */}
             {resources.length === 0 ? (
                 // Global Empty State
-                <GlassCard className="p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
+                <MatteCard className="p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
                     <motion.div
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -155,10 +155,10 @@ export default function ResourcesPage() {
                     >
                         Add your first resource
                     </button>
-                </GlassCard>
+                </MatteCard>
             ) : filteredResources.length === 0 ? (
                 // Filter Empty State
-                <GlassCard className="p-12 flex flex-col items-center justify-center text-center min-h-[300px]">
+                <MatteCard className="p-12 flex flex-col items-center justify-center text-center min-h-[300px]">
                     <p className="text-gray-500">No resources matches your filters.</p>
                     <button
                         onClick={() => {
@@ -169,7 +169,7 @@ export default function ResourcesPage() {
                     >
                         Clear filters
                     </button>
-                </GlassCard>
+                </MatteCard>
             ) : (
                 // Grid
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -183,7 +183,7 @@ export default function ResourcesPage() {
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <GlassCard className={`p-4 h-full flex flex-col relative group transition-colors ${r.isConsumed ? "opacity-60 hover:opacity-100" : ""}`}>
+                                <MatteCard className={`p-4 h-full flex flex-col relative group transition-colors ${r.isConsumed ? "opacity-60 hover:opacity-100" : ""}`}>
 
                                     {/* Top Row: Icon & Delete */}
                                     <div className="flex justify-between items-start mb-3">
@@ -239,7 +239,7 @@ export default function ResourcesPage() {
                                             {r.isConsumed ? "Completed" : "Mark as Done"}
                                         </button>
                                     </div>
-                                </GlassCard>
+                                </MatteCard>
                             </motion.div>
                         ))}
                     </AnimatePresence>

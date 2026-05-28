@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SpatialCard } from "@/components/ui/SpatialCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { Map, CheckSquare, Square, Trophy, RotateCcw } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import confetti from "canvas-confetti";
@@ -83,7 +83,7 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
 
     if (!activeRoadmap) {
         return (
-            <SpatialCard className={`p-8 flex items-center justify-center relative overflow-hidden ${className}`} glowColor="rgba(56,189,248,0.08)">
+            <MatteCard className={`p-8 flex items-center justify-center relative overflow-hidden ${className}`}>
                 <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
                     <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
                         <circle cx="100" cy="100" r="70" stroke="rgba(56,189,248,0.5)" strokeWidth="1" strokeDasharray="4 6" />
@@ -98,12 +98,12 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                     <p className="text-white/60 text-base font-medium">No active roadmap</p>
                     <p className="text-white/25 text-sm mt-1">Select one to begin tracking.</p>
                 </div>
-            </SpatialCard>
+            </MatteCard>
         );
     }
 
     return (
-        <SpatialCard className={`p-6 relative flex flex-col ${className}`} glowColor="rgba(56,189,248,0.08)">
+        <MatteCard className={`p-6 relative flex flex-col ${className}`}>
             <p className="relative z-10 text-white/30 text-[10px] tracking-widest uppercase mb-4">Active Roadmap</p>
 
             <AnimatePresence mode="wait">
@@ -229,6 +229,6 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </SpatialCard>
+        </MatteCard>
     );
 };

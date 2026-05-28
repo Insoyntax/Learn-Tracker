@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { SpatialCard } from "@/components/ui/SpatialCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { useDashboardStore, Quest } from "@/store/useDashboardStore";
 import { GlowingNode } from "@/components/ui/GlowingNode";
 import { Check, Sword, ArrowRight, Sparkles } from "lucide-react";
@@ -49,7 +49,7 @@ export const DailyGoalsWidget = ({ className }: { className?: string }) => {
         .slice(0, 4);
 
     return (
-        <SpatialCard className={`flex flex-col p-0 ${className}`} glowColor="rgba(167, 139, 250, 0.1)">
+        <MatteCard className={`flex flex-col p-0 ${className}`}>
 
             {/* ── Header ── */}
             <div className="px-6 pt-6 pb-4 border-b border-white/[0.05]">
@@ -179,6 +179,6 @@ export const DailyGoalsWidget = ({ className }: { className?: string }) => {
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </Link>
             </div>
-        </SpatialCard>
+        </MatteCard>
     );
 };

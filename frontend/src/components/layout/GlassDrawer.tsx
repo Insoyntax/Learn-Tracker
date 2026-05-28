@@ -130,8 +130,8 @@ export const GlassDrawer = () => {
                                     <Zap className="w-4 h-4 text-sky-300" />
                                 </div>
                                 <div>
-                                    <p className="text-white font-semibold text-sm tracking-tight">Learn Tracker</p>
-                                    <p className="text-white/30 text-[10px] tracking-wide">Spatial OS</p>
+                                    <p className="text-white font-semibold text-sm tracking-tight">Sinau.id</p>
+                                    <p className="text-white/30 text-[10px] tracking-wide">Matte SaaS</p>
                                 </div>
                             </div>
 

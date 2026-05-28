@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { SpatialCard } from "@/components/ui/SpatialCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { Flame, TrendingUp } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useState, useMemo } from "react";
@@ -62,10 +62,8 @@ export const StreakWidget = ({ className }: { className?: string }) => {
                 className={`text-left w-full h-full ${className}`}
                 whileTap={{ scale: 0.99 }}
             >
-                <SpatialCard
+                <MatteCard
                     className="flex flex-col justify-between p-6 h-full"
-                    glowColor="rgba(251, 146, 60, 0.12)"
-                    magnetic={false}
                 >
                     {/* ── Header ── */}
                     <div className="flex items-start justify-between mb-4">
@@ -163,7 +161,7 @@ export const StreakWidget = ({ className }: { className?: string }) => {
                             />
                         </div>
                     </div>
-                </SpatialCard>
+                </MatteCard>
             </motion.button>
 
             <AnimatePresence>

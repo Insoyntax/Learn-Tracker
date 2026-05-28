@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, birthdate, school, username, password } = body;
+    const { name, birthdate, role, username, password } = body;
 
     if (!name?.trim() || !username?.trim() || !password) {
       return err("VALIDATION_ERROR", "Nama, Username, dan Password wajib diisi", 400);
@@ -22,11 +22,11 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const dummyEmail = `${username.trim()}@learntracker.local`;
+    const dummyEmail = `${username.trim()}@sinau.local`;
 
     const rows = await sql`
-      INSERT INTO users (name, email, username, password_hash, birthdate, school, xp, level, current_streak)
-      VALUES (${name.trim()}, ${dummyEmail}, ${username.trim()}, ${passwordHash}, ${birthdate ?? null}, ${school?.trim() ?? null}, 0, 1, 0)
+      INSERT INTO users (name, email, username, password_hash, birthdate, role, xp, level, current_streak)
+      VALUES (${name.trim()}, ${dummyEmail}, ${username.trim()}, ${passwordHash}, ${birthdate ?? null}, ${role?.trim() ?? null}, 0, 1, 0)
       RETURNING id`;
 
     return ok({ message: "Pendaftaran berhasil! Silakan login.", userId: rows[0].id }, 201);

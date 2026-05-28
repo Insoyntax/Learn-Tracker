@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SpatialCard } from "@/components/ui/SpatialCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { Play, Pause, RotateCcw, CheckSquare, ChevronDown } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import toast from "react-hot-toast";
@@ -109,9 +109,8 @@ export const FocusTimerWidget = ({ className }: { className?: string }) => {
     const focusRingProgress = isRunning ? Math.min(progressPercent * 1.2, 100) : progressPercent;
 
     return (
-        <SpatialCard
+        <MatteCard
             className={`p-6 flex flex-col justify-between overflow-visible relative z-20 ${className}`}
-            glowColor={isRunning ? "rgba(52, 211, 153, 0.12)" : "rgba(56, 189, 248, 0.08)"}
         >
             {/* ── Header ── */}
             <div className="flex items-center justify-between">
@@ -253,6 +252,6 @@ export const FocusTimerWidget = ({ className }: { className?: string }) => {
                     </button>
                 )}
             </div>
-        </SpatialCard>
+        </MatteCard>
     );
 };

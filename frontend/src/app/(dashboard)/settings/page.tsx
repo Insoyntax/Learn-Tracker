@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-import { GlassCard } from "@/components/ui/GlassCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import {
     Paintbrush, Bell, Database, Check, AlertTriangle, Trash2,
@@ -120,7 +120,7 @@ export default function SettingsPage() {
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <GlassCard className="p-8">
+                                <MatteCard className="p-8">
                                     <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                         <User className="w-5 h-5" style={{ color: "var(--accent-color, #8b5cf6)" }} />
                                         Profile
@@ -159,7 +159,7 @@ export default function SettingsPage() {
                                             </p>
                                         </div>
                                     </div>
-                                </GlassCard>
+                                </MatteCard>
                             </motion.div>
                         )}
 
@@ -172,7 +172,7 @@ export default function SettingsPage() {
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <GlassCard className="p-8">
+                                <MatteCard className="p-8">
                                     <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                         <Paintbrush className="w-5 h-5" style={{ color: "var(--accent-color, #8b5cf6)" }} />
                                         Accent Color
@@ -207,7 +207,7 @@ export default function SettingsPage() {
                                             </button>
                                         ))}
                                     </div>
-                                </GlassCard>
+                                </MatteCard>
                             </motion.div>
                         )}
 
@@ -220,7 +220,7 @@ export default function SettingsPage() {
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <GlassCard className="p-8">
+                                <MatteCard className="p-8">
                                     <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                         <Clock className="w-5 h-5" style={{ color: "var(--accent-color, #8b5cf6)" }} />
                                         Timer Defaults
@@ -255,7 +255,7 @@ export default function SettingsPage() {
                                             </span>
                                         </div>
                                     </div>
-                                </GlassCard>
+                                </MatteCard>
                             </motion.div>
                         )}
 
@@ -268,7 +268,7 @@ export default function SettingsPage() {
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <GlassCard className="p-8">
+                                <MatteCard className="p-8">
                                     <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                         <Bell className="w-5 h-5" style={{ color: "var(--accent-color, #8b5cf6)" }} />
                                         Notifications
@@ -295,7 +295,7 @@ export default function SettingsPage() {
                                             />
                                         </button>
                                     </div>
-                                </GlassCard>
+                                </MatteCard>
                             </motion.div>
                         )}
 
@@ -308,7 +308,7 @@ export default function SettingsPage() {
                                 exit={{ opacity: 0, x: -20 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <GlassCard className="p-8 border-red-500/20">
+                                <MatteCard className="p-8 border-red-500/20">
                                     <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                         <Database className="w-5 h-5 text-red-400" />
                                         Danger Zone
@@ -353,7 +353,7 @@ export default function SettingsPage() {
                                             </div>
                                         </div>
                                     )}
-                                </GlassCard>
+                                </MatteCard>
                             </motion.div>
                         )}
                     </AnimatePresence>

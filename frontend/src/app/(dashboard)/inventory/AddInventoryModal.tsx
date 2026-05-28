@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X, Archive, FileText, Code, Link as LinkIcon } from "lucide-react";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import CreatableSelect from 'react-select/creatable';
 import { StylesConfig, SingleValue } from 'react-select';
@@ -42,7 +42,7 @@ export const AddInventoryModal = ({ onClose }: AddInventoryModalProps) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-            <GlassCard className="w-full max-w-2xl p-6 relative z-10 animate-in fade-in zoom-in-95 duration-200">
+            <MatteCard className="w-full max-w-2xl p-6 relative z-10 animate-in fade-in zoom-in-95 duration-200">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                         <Archive className="w-5 h-5 text-indigo-400" />
@@ -196,7 +196,7 @@ export const AddInventoryModal = ({ onClose }: AddInventoryModalProps) => {
                         </button>
                     </div>
                 </form>
-            </GlassCard>
+            </MatteCard>
         </div>
     );
 };

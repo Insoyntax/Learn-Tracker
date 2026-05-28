@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { Sword, Loader2, Sparkles, AlertCircle } from "lucide-react";
 import { useEffect } from "react";
 
@@ -138,12 +138,12 @@ export default function QuestsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {isGeneratingQuests ? (
                         Array.from({ length: 4 }).map((_, i) => (
-                            <GlassCard key={i} className="h-48 border border-white/5 bg-white/[0.01] animate-pulse flex flex-col p-6">
+                            <MatteCard key={i} className="h-48 border border-white/5 bg-white/[0.01] animate-pulse flex flex-col p-6">
                                 <div className="h-6 w-24 bg-white/10 rounded mb-4" />
                                 <div className="h-4 w-full bg-white/10 rounded mb-2" />
                                 <div className="h-4 w-2/3 bg-white/10 rounded mb-auto" />
                                 <div className="h-10 w-full bg-white/10 rounded mt-4" />
-                            </GlassCard>
+                            </MatteCard>
                         ))
                     ) : (
                         quests.map((quest, index) => {

@@ -1,198 +1,170 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Plus, ListTodo, Settings, Search, CheckCircle2 } from "lucide-react";
-import {
-    DndContext,
-    DragOverlay,
-    closestCorners,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    DragStartEvent,
-    DragOverEvent,
-    DragEndEvent,
-} from "@dnd-kit/core";
-import { sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
-import { useDashboardStore, StudioTask, StudioTaskStatus } from "@/store/useDashboardStore";
-
-import { KanbanColumn } from "@/components/studio/KanbanColumn";
-import { TaskCard } from "@/components/studio/TaskCard";
-import { AddStudioTaskModal } from "@/components/studio/AddStudioTaskModal";
-
-const COLUMNS: { id: StudioTaskStatus; title: string; icon: React.ReactNode }[] = [
-    { id: 'TODO', title: "To Do", icon: <ListTodo className="w-4 h-4 text-emerald-400" /> },
-    { id: 'IN_PROGRESS', title: "In Progress", icon: <Settings className="w-4 h-4 text-blue-400" /> },
-    { id: 'REVIEW', title: "Review/Polish", icon: <Search className="w-4 h-4 text-purple-400" /> },
-    { id: 'DONE', title: "Done", icon: <CheckCircle2 className="w-4 h-4 text-green-400" /> },
-];
+import { MatteCard } from "@/components/ui/MatteCard";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { Search, Plus, MoreHorizontal, MessageSquare, Paperclip } from "lucide-react";
 
 export default function StudioPage() {
-    const studioTasks = useDashboardStore((s) => s.studioTasks);
-    const moveStudioTask = useDashboardStore((s) => s.moveStudioTask);
-
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [activeId, setActiveId] = useState<string | null>(null);
-
-    // Shadow state for butter-smooth dnd-kit multi-list dragging
-    const [localTasks, setLocalTasks] = useState<StudioTask[]>(studioTasks);
-
-    // Sync global to local unless actively dragging
-    useEffect(() => {
-        if (!activeId) {
-            setLocalTasks(studioTasks);
-        }
-    }, [studioTasks, activeId]);
-
-    // Group tasks by status for rendering
-    const tasksByStatus = COLUMNS.reduce((acc, col) => {
-        acc[col.id] = localTasks.filter((t) => t.status === col.id);
-        return acc;
-    }, {} as Record<StudioTaskStatus, StudioTask[]>);
-
-    const activeTask = activeId ? localTasks.find(t => t.id === activeId) : null;
-
-    const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-    );
-
-    const handleDragStart = (event: DragStartEvent) => {
-        setActiveId(event.active.id as string);
-    };
-
-    const handleDragOver = (event: DragOverEvent) => {
-        const { active, over } = event;
-        if (!over) return;
-
-        const activeIdStr = active.id as string;
-        const overIdStr = over.id as string;
-
-        if (activeIdStr === overIdStr) return;
-
-        const isActiveTask = active.data.current?.type === "Task";
-        const isOverTask = over.data.current?.type === "Task";
-
-        if (!isActiveTask) return;
-
-        // Dropping a Task over another Task
-        if (isActiveTask && isOverTask) {
-            setLocalTasks((tasks) => {
-                const activeIndex = tasks.findIndex((t) => t.id === activeIdStr);
-                const overIndex = tasks.findIndex((t) => t.id === overIdStr);
-
-                if (tasks[activeIndex].status !== tasks[overIndex].status) {
-                    const newTasks = [...tasks];
-                    newTasks[activeIndex] = { ...newTasks[activeIndex], status: tasks[overIndex].status };
-                    return arrayMove(newTasks, activeIndex, overIndex);
-                }
-
-                return arrayMove(tasks, activeIndex, overIndex);
-            });
-            return;
-        }
-
-        // Dropping a Task over an empty Column
-        const isOverAColumn = over.data.current?.type === "Column";
-        if (isActiveTask && isOverAColumn) {
-            setLocalTasks((tasks) => {
-                const activeIndex = tasks.findIndex((t) => t.id === activeIdStr);
-                const newTasks = [...tasks];
-                newTasks[activeIndex] = { ...newTasks[activeIndex], status: overIdStr as StudioTaskStatus };
-                return arrayMove(newTasks, activeIndex, activeIndex); // Just trigger re-render
-            });
-        }
-    };
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-        const currentActiveId = active.id as string;
-
-        // Find where the task dropped logically via the shadowed array
-        const finalTaskState = localTasks.find(t => t.id === currentActiveId);
-
-        // Commit the logical column transfer to Zustand (which handles XP granting)
-        // Only if it actually changed column!
-        const originalTask = studioTasks.find(t => t.id === currentActiveId);
-        if (finalTaskState && originalTask && finalTaskState.status !== originalTask.status) {
-            moveStudioTask(finalTaskState.id, finalTaskState.status);
-        }
-
-        setActiveId(null);
-    };
-
     return (
-        <div className="flex flex-col h-screen -m-6 p-6 overflow-hidden relative">
-            {/* Background elements */}
-            <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-            <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
-
+        <div className="h-full flex flex-col space-y-6 max-w-[1600px] mx-auto overflow-hidden">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 relative z-10 shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <motion.h1
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-3xl font-bold text-white mb-2"
-                    >
-                        Creator Pipeline
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-slate-400"
-                    >
-                        Drag and drop your project tasks. Completing tasks earns XP!
-                    </motion.p>
+                    <h1 className="text-3xl font-bold text-zinc-100 tracking-tight">Homework Studio</h1>
+                    <p className="text-zinc-400 mt-1">Manage your tasks and assignments.</p>
                 </div>
-
-                <motion.button
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center gap-2 px-5 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold shadow-lg shadow-primary/25 transition-all w-fit"
-                >
-                    <Plus className="w-5 h-5" />
-                    Add Task
-                </motion.button>
+                <div className="flex items-center gap-3">
+                    <div className="relative group">
+                        <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-cyan-400" />
+                        <input 
+                            type="text"
+                            placeholder="Filter tasks..."
+                            className="w-full sm:w-64 bg-[#1C1C1E] border border-white/5 rounded-lg py-2 pl-9 pr-4 text-sm text-zinc-100 focus:outline-none focus:border-cyan-500/50"
+                        />
+                    </div>
+                    <button className="flex items-center gap-2 px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-medium rounded-lg transition-colors text-sm">
+                        <Plus className="w-4 h-4" />
+                        New Task
+                    </button>
+                </div>
             </div>
 
-            {/* Board Container */}
-            <div className="flex-1 overflow-x-auto overflow-y-hidden pb-4 custom-scrollbar relative z-10">
-                <div className="flex gap-6 h-full items-start px-2 min-w-max">
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCorners}
-                        onDragStart={handleDragStart}
-                        onDragOver={handleDragOver}
-                        onDragEnd={handleDragEnd}
-                    >
-                        {COLUMNS.map((col) => (
-                            <KanbanColumn
-                                key={col.id}
-                                id={col.id}
-                                title={col.title}
-                                icon={col.icon}
-                                tasks={tasksByStatus[col.id] || []}
+            {/* Kanban Board */}
+            <div className="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar pb-4">
+                <div className="flex gap-6 h-full min-w-[1000px]">
+                    
+                    {/* To Do Column */}
+                    <div className="flex-1 flex flex-col min-w-[280px]">
+                        <div className="flex items-center justify-between mb-4 px-1">
+                            <h3 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-zinc-500" />
+                                To Do
+                            </h3>
+                            <span className="text-xs text-zinc-500 font-medium bg-white/5 px-2 py-0.5 rounded-full">3</span>
+                        </div>
+                        <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
+                            <TaskCard 
+                                title="Read Chapter 4: Neural Networks" 
+                                course="Deep Learning 101"
+                                priority="High" 
+                                color="rose"
                             />
-                        ))}
+                            <TaskCard 
+                                title="Set up Next.js Boilerplate" 
+                                course="Fullstack Dev"
+                                priority="Medium" 
+                                color="amber"
+                            />
+                            <TaskCard 
+                                title="Write Essay Outline" 
+                                course="English Lit"
+                                priority="Low" 
+                                color="cyan"
+                            />
+                        </div>
+                    </div>
 
-                        <DragOverlay>
-                            {activeTask ? <TaskCard task={activeTask} /> : null}
-                        </DragOverlay>
-                    </DndContext>
+                    {/* In Progress Column */}
+                    <div className="flex-1 flex flex-col min-w-[280px]">
+                        <div className="flex items-center justify-between mb-4 px-1">
+                            <h3 className="text-sm font-semibold text-cyan-400 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                                In Progress
+                            </h3>
+                            <span className="text-xs text-zinc-500 font-medium bg-white/5 px-2 py-0.5 rounded-full">1</span>
+                        </div>
+                        <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
+                            <TaskCard 
+                                title="Implement JWT Authentication" 
+                                course="Backend Architecture"
+                                priority="High" 
+                                color="rose"
+                                active
+                            />
+                        </div>
+                    </div>
+
+                    {/* Approval Column */}
+                    <div className="flex-1 flex flex-col min-w-[280px]">
+                        <div className="flex items-center justify-between mb-4 px-1">
+                            <h3 className="text-sm font-semibold text-amber-400 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                                Under Review
+                            </h3>
+                            <span className="text-xs text-zinc-500 font-medium bg-white/5 px-2 py-0.5 rounded-full">1</span>
+                        </div>
+                        <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
+                            <TaskCard 
+                                title="Submit Draft for Peer Review" 
+                                course="English Lit"
+                                priority="Medium" 
+                                color="amber"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Completed Column */}
+                    <div className="flex-1 flex flex-col min-w-[280px]">
+                        <div className="flex items-center justify-between mb-4 px-1">
+                            <h3 className="text-sm font-semibold text-emerald-400 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                                Completed
+                            </h3>
+                            <span className="text-xs text-zinc-500 font-medium bg-white/5 px-2 py-0.5 rounded-full">2</span>
+                        </div>
+                        <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
+                            <TaskCard 
+                                title="Watch Lecture 1 & 2" 
+                                course="Deep Learning 101"
+                                priority="Medium" 
+                                color="amber"
+                                completed
+                            />
+                            <TaskCard 
+                                title="Design Database Schema" 
+                                course="Backend Architecture"
+                                priority="High" 
+                                color="rose"
+                                completed
+                            />
+                        </div>
+                    </div>
+
                 </div>
             </div>
-
-            {/* Modals */}
-            {isAddModalOpen && (
-                <AddStudioTaskModal onClose={() => setIsAddModalOpen(false)} />
-            )}
         </div>
+    );
+}
+
+function TaskCard({ title, course, priority, color, active, completed }: any) {
+    return (
+        <MatteCard className={`p-4 cursor-pointer group transition-all hover:-translate-y-1 ${active ? 'border-cyan-500/50 shadow-cyan-900/20' : ''} ${completed ? 'opacity-50' : ''}`}>
+            <div className="flex items-start justify-between mb-3">
+                <StatusBadge color={color as any}>{priority}</StatusBadge>
+                <button className="text-zinc-500 hover:text-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <MoreHorizontal className="w-4 h-4" />
+                </button>
+            </div>
+            <h4 className={`text-sm font-medium mb-1 ${completed ? 'line-through text-zinc-500' : 'text-zinc-200'}`}>
+                {title}
+            </h4>
+            <p className="text-xs text-zinc-500 mb-4">{course}</p>
+            
+            <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 text-zinc-500">
+                        <MessageSquare className="w-3 h-3" />
+                        <span className="text-[10px]">2</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-zinc-500">
+                        <Paperclip className="w-3 h-3" />
+                        <span className="text-[10px]">1</span>
+                    </div>
+                </div>
+                <div className="w-6 h-6 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-[10px] font-medium">
+                    US
+                </div>
+            </div>
+        </MatteCard>
     );
 }

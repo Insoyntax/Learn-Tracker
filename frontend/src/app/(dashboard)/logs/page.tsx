@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 
-import { GlassCard } from "@/components/ui/GlassCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { ActivityHeatmap } from "@/components/logs/ActivityHeatmap";
 import { ManualLogModal } from "@/components/logs/ManualLogModal";
 import { StatsDetailsModal } from "@/components/logs/StatsDetailsModal";
@@ -73,18 +73,17 @@ export default function LogsPage() {
             {/* ─── Analytics Section ────────────────────────────────────────────── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 {/* Heatmap Card (Spans 2 cols) */}
-                <GlassCard className="md:col-span-2 p-6 flex flex-col gap-4">
+                <MatteCard className="md:col-span-2 p-6 flex flex-col gap-4">
                     <div className="flex items-center gap-2 mb-2">
                         <Calendar className="w-5 h-5 text-indigo-400" />
                         <h3 className="text-lg font-semibold text-white">Study Consistency</h3>
                     </div>
                     <ActivityHeatmap />
-                </GlassCard>
+                </MatteCard>
 
                 {/* KPI Cards */}
                 <div className="flex flex-col gap-4">
-                    <GlassCard
-                        hoverEffect
+                    <MatteCard
                         onClick={() => setSelectedStat('time')}
                         className="flex-1 p-5 flex items-center justify-between cursor-pointer group"
                     >
@@ -98,10 +97,9 @@ export default function LogsPage() {
                         <div className="p-3 rounded-xl bg-blue-500/10 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
                             <BarChart3 className="w-6 h-6" />
                         </div>
-                    </GlassCard>
+                    </MatteCard>
 
-                    <GlassCard
-                        hoverEffect
+                    <MatteCard
                         onClick={() => setSelectedStat('streak')}
                         className="flex-1 p-5 flex items-center justify-between cursor-pointer group"
                     >
@@ -115,10 +113,9 @@ export default function LogsPage() {
                         <div className="p-3 rounded-xl bg-orange-500/10 text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-all">
                             <Flame className="w-6 h-6" />
                         </div>
-                    </GlassCard>
+                    </MatteCard>
 
-                    <GlassCard
-                        hoverEffect
+                    <MatteCard
                         onClick={() => setSelectedStat('focus')}
                         className="flex-1 p-5 flex items-center justify-between cursor-pointer group"
                     >
@@ -131,7 +128,7 @@ export default function LogsPage() {
                         <div className="p-3 rounded-xl bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all">
                             <PieChart className="w-6 h-6" />
                         </div>
-                    </GlassCard>
+                    </MatteCard>
                 </div>
             </div>
 

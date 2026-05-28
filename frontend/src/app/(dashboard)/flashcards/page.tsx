@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { Brain, Plus, Trash2, ArrowRight } from "lucide-react";
 import { AddFlashcardModal } from "./AddFlashcardModal";
 
@@ -84,7 +84,7 @@ export default function FlashcardsPage() {
                                 className="absolute inset-0 w-full h-full"
                                 style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
                             >
-                                <GlassCard
+                                <MatteCard
                                     className="w-full h-full p-8 flex flex-col justify-center items-center text-center border-primary/20 shadow-[0_0_30px_var(--primary-glow)] hover:border-primary/40 transition-colors"
                                 >
                                     <span className="absolute top-6 left-6 px-3 py-1 bg-white/5 rounded-full text-xs font-bold text-gray-400 border border-white/5">
@@ -98,7 +98,7 @@ export default function FlashcardsPage() {
                                             Click to reveal answer <ArrowRight className="w-4 h-4" />
                                         </div>
                                     )}
-                                </GlassCard>
+                                </MatteCard>
                             </div>
 
                             {/* Back of Card */}
@@ -110,13 +110,13 @@ export default function FlashcardsPage() {
                                     transform: "rotateY(180deg)"
                                 }}
                             >
-                                <GlassCard
+                                <MatteCard
                                     className="w-full h-full p-8 flex flex-col justify-center items-center text-center border-primary/20 shadow-[0_0_30px_var(--primary-glow)]"
                                 >
                                     <h3 className="text-2xl font-medium text-slate-200 leading-relaxed max-w-lg mb-8">
                                         {currentCard?.back}
                                     </h3>
-                                </GlassCard>
+                                </MatteCard>
                             </div>
                         </motion.div>
                     </div>
@@ -168,7 +168,7 @@ export default function FlashcardsPage() {
                             {flashcards.map(card => {
                                 const isOverdue = new Date(card.nextReviewDate) <= now;
                                 return (
-                                    <GlassCard
+                                    <MatteCard
                                         key={card.id}
                                         className="p-6 flex flex-col items-start gap-4 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:border-primary/30 transition-all group"
                                     >
@@ -195,7 +195,7 @@ export default function FlashcardsPage() {
                                                 Due: {new Date(card.nextReviewDate).toLocaleDateString()}
                                             </span>
                                         </div>
-                                    </GlassCard>
+                                    </MatteCard>
                                 );
                             })}
                         </div>

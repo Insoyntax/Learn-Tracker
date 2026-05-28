@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { Heart, Sparkles, Zap } from "lucide-react";
-import { SpatialCard } from "@/components/ui/SpatialCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 
 const QUOTES = [
     "You're doing great!",
@@ -156,15 +156,8 @@ export const VirtualFamiliarWidget = ({ className }: { className?: string }) => 
     };
 
     return (
-        <SpatialCard
+        <MatteCard
             className={`h-full flex flex-col items-center justify-between p-6 relative ${className}`}
-            glowColor={
-                isHealthy
-                    ? "rgba(52, 211, 153, 0.1)"
-                    : isDanger
-                        ? "rgba(248, 113, 113, 0.12)"
-                        : "rgba(251, 146, 60, 0.1)"
-            }
         >
             {/* Level badge */}
             <div className="w-full flex items-center justify-between mb-2">
@@ -244,6 +237,6 @@ export const VirtualFamiliarWidget = ({ className }: { className?: string }) => 
                     Tap the orb to interact
                 </p>
             </div>
-        </SpatialCard>
+        </MatteCard>
     );
 };

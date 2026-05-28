@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { PenTool, Sparkles, Save, Check, FileText, Trash2 } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import toast from "react-hot-toast";
@@ -26,7 +26,7 @@ export const QuickNoteWidget = ({ className }: { className?: string }) => {
     };
 
     return (
-        <GlassCard className={`p-6 flex flex-col h-full ${className}`}>
+        <MatteCard className={`p-6 flex flex-col h-full ${className}`}>
             {/* Eyebrow */}
             <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">✍️ Quick Jots</p>
 
@@ -132,6 +132,6 @@ export const QuickNoteWidget = ({ className }: { className?: string }) => {
                     {content.length} chars
                 </motion.span>
             </div>
-        </GlassCard>
+        </MatteCard>
     );
 };

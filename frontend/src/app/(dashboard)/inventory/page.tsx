@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Archive, Plus, Trash2, Code, FileText, Link as LinkIcon, Copy, Check } from "lucide-react";
 import { useDashboardStore, InventoryItem } from "@/store/useDashboardStore";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { AddInventoryModal } from "./AddInventoryModal";
 import toast from "react-hot-toast";
 
@@ -55,7 +55,7 @@ export default function InventoryPage() {
             </header>
 
             {inventoryItems.length === 0 ? (
-                <GlassCard className="p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
+                <MatteCard className="p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
                     <motion.div
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -74,7 +74,7 @@ export default function InventoryPage() {
                     >
                         Store your first asset
                     </button>
-                </GlassCard>
+                </MatteCard>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <AnimatePresence mode="popLayout">
@@ -87,7 +87,7 @@ export default function InventoryPage() {
                                 exit={{ opacity: 0, scale: 0.9, y: -20 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <GlassCard className="h-[350px] flex flex-col group relative overflow-hidden flex-1 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:border-indigo-500/30 transition-all">
+                                <MatteCard className="h-[350px] flex flex-col group relative overflow-hidden flex-1 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:border-indigo-500/30 transition-all">
 
                                     {/* Header */}
                                     <div className="p-5 border-b border-white/5 bg-black/20">
@@ -165,7 +165,7 @@ export default function InventoryPage() {
                                             )}
                                         </button>
                                     </div>
-                                </GlassCard>
+                                </MatteCard>
                             </motion.div>
                         ))}
                     </AnimatePresence>

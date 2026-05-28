@@ -27,7 +27,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Learn Tracker",
+  title: "Sinau.id",
   description: "Your intelligent learning assistant",
 };
 

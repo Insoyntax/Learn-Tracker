@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { GlassCard } from "@/components/ui/GlassCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { Map, Plus, Trash2, Star, Check, Filter } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { RoadmapBuilderModal } from "@/components/roadmaps/RoadmapBuilderModal";
@@ -94,7 +94,7 @@ export default function RoadmapsPage() {
             {/* Content Area */}
             {roadmaps.length === 0 ? (
                 // Global Empty State
-                <GlassCard className="p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
+                <MatteCard className="p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
                     <motion.div
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -113,10 +113,10 @@ export default function RoadmapsPage() {
                     >
                         Create your first roadmap
                     </button>
-                </GlassCard>
+                </MatteCard>
             ) : filteredRoadmaps.length === 0 ? (
                 // Filter Empty State
-                <GlassCard className="p-12 flex flex-col items-center justify-center text-center min-h-[300px]">
+                <MatteCard className="p-12 flex flex-col items-center justify-center text-center min-h-[300px]">
                     <p className="text-gray-500">No roadmaps found in <span className="text-white font-medium">"{selectedCategory}"</span>.</p>
                     <button
                         onClick={() => setSelectedCategory("All")}
@@ -124,7 +124,7 @@ export default function RoadmapsPage() {
                     >
                         Clear filter
                     </button>
-                </GlassCard>
+                </MatteCard>
             ) : (
                 // Grid Layout
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -138,7 +138,7 @@ export default function RoadmapsPage() {
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <GlassCard className="p-6 h-full flex flex-col group relative">
+                                <MatteCard className="p-6 h-full flex flex-col group relative">
                                     {/* Active Badge */}
                                     {activeRoadmapId === roadmap.id && (
                                         <div className="absolute top-4 right-4 px-2 py-1 rounded-md bg-yellow-500/10 border border-yellow-500/10 text-yellow-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
@@ -206,7 +206,7 @@ export default function RoadmapsPage() {
                                             </button>
                                         )}
                                     </div>
-                                </GlassCard>
+                                </MatteCard>
                             </motion.div>
                         ))}
                     </AnimatePresence>

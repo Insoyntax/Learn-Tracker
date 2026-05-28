@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDashboardStore, getCategoryLevelInfo } from "@/store/useDashboardStore";
 import { SkillDetailsModal } from "./SkillDetailsModal";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { MatteCard } from "@/components/ui/MatteCard";
 import { Zap, Trophy, Target, Award, Star } from "lucide-react";
 
 // Helper to determine the glow intensity based on level
@@ -96,7 +96,7 @@ export default function SkillsPage() {
                     className="relative group cursor-default"
                 >
                     <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
-                    <GlassCard className="relative z-10 p-8 flex flex-col items-center justify-center text-center gap-4 w-64 h-64 border-primary/30 shadow-[0_0_50px_var(--primary-glow)] overflow-hidden">
+                    <MatteCard className="relative z-10 p-8 flex flex-col items-center justify-center text-center gap-4 w-64 h-64 border-primary/30 shadow-[0_0_50px_var(--primary-glow)] overflow-hidden">
                         {/* Shimmer effect */}
                         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
 
@@ -122,7 +122,7 @@ export default function SkillsPage() {
                                 />
                             </div>
                         </div>
-                    </GlassCard>
+                    </MatteCard>
                 </motion.div>
             </div>
 
@@ -163,7 +163,7 @@ export default function SkillsPage() {
                             onClick={() => setSelectedCategory(skill.name)}
                             className="cursor-pointer"
                         >
-                            <GlassCard
+                            <MatteCard
                                 className={`p-6 flex flex-col items-center justify-center text-center gap-4 hover:-translate-y-1 transition-all duration-300 ${getGlowIntensity(skill.level)}`}
                             >
                                 {/* Level Badge */}
@@ -190,7 +190,7 @@ export default function SkillsPage() {
                                         {Math.round(skill.nextLevelXp - skill.currentXp)} XP to next level
                                     </div>
                                 </div>
-                            </GlassCard>
+                            </MatteCard>
                         </motion.div>
                     ))}
                 </div>
