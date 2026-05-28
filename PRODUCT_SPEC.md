@@ -1,18 +1,18 @@
-# Learn Tracker — Product Specification
+# Sinau.id — Product Specification
 
-> **Version:** 2.0  
-> **Last Updated:** May 27, 2026  
-> **Status:** In Development (Advanced MVP - Next.js Standalone Migration)
+> **Version:** 3.0  
+> **Last Updated:** May 29, 2026  
+> **Status:** Fully Migrated to Standalone & Rebranded to Sinau.id (Premium Matte Dark SaaS)
 
 ---
 
 ## 1. Overview
 
-**Learn Tracker** is a personal learning management application that helps self-directed learners organize, track, and gamify their learning journey. It combines structured roadmaps, study session logging, resource bookmarking, and quick notes into a single, visually immersive dashboard.
+**Sinau.id** is a premium, professional-grade self-directed learning management ecosystem (LMS) designed to help modern professionals, developers, and lifelong learners organize, track, and gamify their learning journey. It merges structured roadmap trackers, study logs, spaced repetition decks, Tavern RPG quests, creator pipeline Kanban boards, inventory management, and motivational virtual familiar companions into a single, cohesive dashboard using a sophisticated Matte Dark SaaS design system.
 
 ### Vision
 
-> _"Turn self-learning into a game you want to keep playing."_
+> _"Empowering consistent, structured, and immersive self-directed education."_
 
 ### Target Users
 
@@ -20,8 +20,8 @@
 | -------------------------- | ----------------------------------------------------------- |
 | **Self-taught Developers** | Learners following online courses, tutorials, and bootcamps |
 | **Career Switchers**       | Professionals reskilling into tech with structured goals    |
-| **Students**               | University/college students supplementing formal education  |
-| **Lifelong Learners**      | Anyone systematically learning new skills or subjects       |
+| **Students & Scholars**    | Academic students supplementing formal education            |
+| **Lifelong Learners**      | Anyone systematically mastering new skills or subjects      |
 
 ---
 
@@ -34,6 +34,7 @@
 | **Styling**            | Tailwind CSS                            | v4                    |
 | **Animations**         | Framer Motion                           | 12.34.2               |
 | **Icons**              | Lucide React                            | 0.575.0               |
+| **Client State**       | Zustand (Persisted client-side store)  | v5                    |
 | **Backend Framework**  | Next.js Serverless Route Handlers       | 16.1.6                |
 | **Database Client**    | `@neondatabase/serverless` (Neon SQL)   | 1.1.0                 |
 | **Database**           | Neon Serverless PostgreSQL              | —                     |
@@ -67,12 +68,13 @@ graph TB
     APIRoutes -->|WebSocket SQL Template Literals| DB
 ```
 
-### Design System
+### Design System (Matte Dark SaaS)
 
-- **Theme:** Neo-Brutalism Dark Mode
-- **Base Component:** `BrutalCard` (aliased as `GlassCard` for compatibility) — solid black cards with thick hard borders border-2 border-white/20, vibrant neon accents (#CFFF04, #F59E0B), hard shadow offset, and Outfit/Inter typography
-- **Layout:** Responsive Bento Grid (1-col mobile → 4-col desktop)
-- **Animations:** Staggered entry and tactile clicks with Framer Motion
+- **Theme:** Sophisticated Matte Dark Mode with high-contrast luminous accent tones.
+- **Base Component:** `MatteCard` — solid dark surface (`bg-[#1C1C1E]`), faint luminous border (`border border-white/5`), subtle drop shadow (`shadow-md shadow-black/20`), elegant rounded corners (`rounded-2xl`).
+- **Typography:** `Outfit` (for headers/uppercase actions) & `Inter` (for readable body and descriptions).
+- **Layout:** Responsive layout with persistent Sidebar/Drawer on desktop/mobile and top utility navbar featuring Familiar Orb, Global Search, and Notification bell.
+- **Animations:** Custom spring motion triggers, glowing orb breathing animations, and tactile micro-animations using Framer Motion.
 
 ---
 
@@ -86,12 +88,17 @@ erDiagram
     users ||--o{ notes : writes
     users ||--o{ quests : undertakes
     users ||--o{ studio_tasks : manages
+    users ||--o{ flashcards : reviews
+    users ||--o{ inventory_items : owns
 
     users {
         serial id PK
+        varchar name
+        varchar email UK
+        timestamp emailVerified
+        varchar image
         varchar username UK
         varchar password_hash
-        varchar full_name
         varchar birthdate
         varchar school
         int xp
@@ -103,11 +110,12 @@ erDiagram
 
     notes {
         serial id PK
-        int user_id FK
         varchar title
         text content
-        varchar category
+        varchar[] tags
+        int user_id FK
         timestamp created_at
+        timestamp updated_at
     }
 
     flashcards {
@@ -149,146 +157,150 @@ erDiagram
 
 ### 5.1 Bento Grid Dashboard
 
-The main interface uses a **Bento-style grid layout** that arranges widgets in a visually dynamic, card-based grid. Each widget is wrapped in a `BrutalCard` (utilizing `GlassCard`) styled with bold borders and hard shadows.
+The main interface utilizes a **Bento Grid Layout** built from premium `MatteCard` containers. The layout organizes core productivity components cleanly while preserving key interactive nodes.
 
-| Widget          | Grid Span       | Purpose                                   |
-| --------------- | --------------- | ----------------------------------------- |
-| **Streak**      | 1 col × 2 rows  | Shows current streak, XP bar, and level   |
-| **Roadmap**     | 2 cols × 2 rows | Active learning path with step completion |
-| **Recent Log**  | 1 col × 1 row   | Last study session with resume action     |
-| **Add Widget**  | 1 col × 1 row   | Placeholder for extensibility             |
-| **Quick Notes** | 4 cols × 1 row  | Full-width markdown note-taking area      |
+| Widget          | Purpose                                                              |
+| --------------- | -------------------------------------------------------------------- |
+| **Streak**      | Tracks consecutive active days, current XP, and level up thresholds  |
+| **Roadmap**     | Active learning path tracker with interactive step toggles           |
+| **Timer**       | Pomodoro-style Focus Timer with live XP yields                      |
+| **Daily Goals** | Tavern daily RPG quests and claims                                   |
+| **Quick Notes** | Seamless markdown note-taking with local storage and catalog listing |
+| **Familiar**    | Motivator familiar status card displaying active pet level and health|
 
 ---
 
 ### 5.2 Streak & Gamification
 
-Tracks learning consistency and rewards progress with XP and levels.
+Tracks learning consistency and rewards progress with XP, level configurations, and rewards.
 
-| Field               | Description                                                         |
-| ------------------- | ------------------------------------------------------------------- |
-| `current_streak`    | Consecutive days of logged study activity                           |
-| `xp`                | Experience points earned from completing steps and logging sessions |
-| `level`             | Derived from XP thresholds (displayed as badge)                     |
-| **XP Progress Bar** | Animated bar showing progress to next level                         |
-
-**Rules:**
-
-- Earn 1 XP per 1 minute of completed study time. Sessions must be at least 5 minutes long to yield XP.
-- +25 XP per roadmap step completed
-- +50 XP bonus for 7-day streak milestone
-- Streak resets if no activity for 24 hours
+- **XP Engine:** Earn 10 XP per 1 minute of active Focus study time. Complete roadmap steps (+50 XP). Complete RPG Tavern quests to trigger instant XP allocation.
+- **Level Configurations (`level_configs`):**
+  - **1 - Novice:** 0 - 99 XP
+  - **2 - Apprentice:** 100 - 299 XP
+  - **3 - Scholar:** 300 - 599 XP
+  - **4 - Adept:** 600 - 999 XP
+  - **5 - Expert:** 1000 - 1499 XP
+  - **6 - Master:** 1500 - 2099 XP
+  - **7 - Grandmaster:** 2100 - 2799 XP
+  - **8 - Legend:** 2800 - 3599 XP
+  - **9 - Mythic:** 3600 - 4499 XP
+  - **10 - Transcendent:** 4500+ XP
 
 ---
 
 ### 5.3 Learning Roadmaps
 
-Structured learning paths with ordered steps.
+Structured curricula and course paths.
 
-**Capabilities:**
-
-- Display active roadmap with step list
-- Visual distinction between completed and pending steps
-- Progress percentage tracking
-- Create, edit, and delete roadmaps
-- Mark steps as completed (toggle)
-- Auto-calculate progress based on completed steps
+- Toggle roadmap step completion.
+- Interactive percentage tracker indicating roadmap completion progress.
+- Create, manage, and delete custom roadmaps with custom category tagging.
 
 ---
 
-### 5.4 Study Log & Timer
+### 5.4 Focus Timer & Study Logs
 
-Tracks study sessions with duration and topic.
+Integrated Pomodoro utility.
 
-**Capabilities:**
-
-- Built-in study timer (start/pause/stop) with Pomodoro capabilities.
-- Live duration and XP yield calculations.
-- Context-aware feeding trigger for the virtual pet companion.
+- Focus timer configuration (e.g. 25-minute defaults) with real-time countdown.
+- Complete sessions to automatically save details in Study Logs, add XP rewards, and feed the virtual familiar companion.
 
 ---
 
-### 5.5 Quick Notes
+### 5.5 Tavern Quests & RPG System
 
-Lightweight note-taking with markdown support.
+RPG Quest Board with weighted random quest generators.
 
-**Capabilities:**
-
-- Full-width textarea with markdown support.
-- Custom saved notes grid.
-- Clean XSS prevention logic.
-
----
-
-### 5.6 Resource Library
-
-Bookmark and categorize learning resources.
-
-**Capabilities:**
-
-- Add/edit/delete resources
-- Categorize by type (article, video, course, book)
-- Quick-access resource cards on dashboard
+- Daily Quests dynamically generated with RNG ranks:
+  - **Rank S:** 500 XP reward (5% spawn chance)
+  - **Rank A:** 250 XP reward (10% spawn chance)
+  - **Rank B:** 100 XP reward (40% spawn chance)
+  - **Rank C:** 50 XP reward (45% spawn chance)
+- Complete Tavern quests to claim bounties, trigger confetti effects, earn items, and automatically feed the virtual companion.
 
 ---
 
-### 5.7 Virtual Familiar
+### 5.6 Creator Studio (Kanban Board)
 
-A gamified virtual pet companion that motivates consistent learning habits.
+A kanban-based creator pipeline built using drag-and-drop actions (`@dnd-kit`).
 
-**Mechanics:**
+- Categories, descriptions, and state tags.
+- Move tasks across standard pipeline status columns: `TODO`, `IN_PROGRESS`, `REVIEW`, `DONE`.
 
-- **HP Restoration (Feeding):** Users restore HP by completing quests or finishing study sessions.
-- **Stat Tracking:** Level, current HP, max HP, and last fed timestamp are persisted in Neon PostgreSQL.
-- **Context-aware Feeding:** Quests and study sessions automatically trigger familiar feeding in the frontend store.
+---
+
+### 5.7 Spaced Repetition (SRS) Flashcards
+
+Spaced repetition flashcards utilizing the SuperMemo-2 (SM-2) algorithm.
+
+- Set front and back contents.
+- Spaced review scheduler that updates target ease factor, interval, and next review date based on qualitative difficulty grades (Easy, Medium, Hard).
+
+---
+
+### 5.8 Virtual Familiar Motivation Companion
+
+Motivating companion pet that motivates daily consistent performance.
+
+- **Status & Stats:** Level, current HP (Max 100), max HP, and last fed timestamp are persisted to Neon PostgreSQL.
+- **Familiar Feeding:** Restores health. Users can feed the familiar through direct food items or let study completion and daily quest claims automatically trigger health restoration.
+- **Visual familiar orb:** Integrated cleanly into the top navigation header, pulsing and breathing depending on active states.
+
+---
+
+### 5.9 Skill Tree, Inventory, Resources & Progress
+
+- **Skill Tree:** Unlockable learning tree nodes.
+- **Inventory:** Stores items acquired through learning quests.
+- **Resources:** Bookmarks, courses, articles categorized by tags.
+- **Progress:** Visual performance metrics and category XP breakdowns.
 
 ---
 
 ## 6. API Endpoints
 
-### Standardized API Response Format
+### Standardized Response Envelope
 
-All backend API responses are standardized into a JSON envelope wrapper to ease frontend state management and error parsing:
+All serverless endpoints return standard envelopes:
 
 **Success Response:**
-
 ```json
 {
   "status": "success",
-  "data": { ... } // or [...]
+  "data": { ... }
 }
 ```
 
 **Error Response:**
-
 ```json
 {
   "status": "error",
   "code": "DB_ERROR",
-  "message": "Human readable error string"
+  "message": "Human readable error details"
 }
 ```
 
-### Route Table (Next.js Serverless Routes)
-
-All paths are relative to the deployment root:
+### Core API Routes
 
 | Method   | Endpoint                      | Description                                    | Auth Required |
 | -------- | ----------------------------- | ---------------------------------------------- | ------------- |
-| `POST`   | `/api/auth/signup`            | User registration with Bcrypt encryption        | No            |
-| `GET`    | `/api/notes`                  | Get paginated notes list                       | Yes           |
-| `POST`   | `/api/notes`                  | Create a new note                              | Yes           |
-| `DELETE` | `/api/notes/[id]`             | Delete a specific note                         | Yes           |
-| `GET`    | `/api/flashcards`             | List active spaced-repetition cards            | Yes           |
-| `POST`   | `/api/flashcards`             | Add flashcard to SRS deck                      | Yes           |
-| `PUT`    | `/api/flashcards/[id]/review` | Submit quality grade to SM-2 SRS Algorithm     | Yes           |
-| `GET`    | `/api/quests`                 | List active daily quests                       | Yes           |
-| `PUT`    | `/api/quests/[id]/complete`   | Log quest completion and trigger XP allocation | Yes           |
-| `GET`    | `/api/studio`                 | Get all Kanban board items                    | Yes           |
-| `POST`   | `/api/studio`                 | Add a new Creator Pipeline task                | Yes           |
-| `PUT`    | `/api/studio/[id]`            | Move pipeline task column status               | Yes           |
-| `GET`    | `/api/familiar`               | Fetch pet HP, level, and feed timestamps       | Yes           |
-| `PUT`    | `/api/familiar/feed`          | Restores HP and persists new familiar status   | Yes           |
+| `POST`   | `/api/auth/signup`            | Custom user sign-up with password hashing      | No            |
+| `GET`    | `/api/projects`               | Fetch active roadmap paths & steps             | Yes           |
+| `GET`    | `/api/notes`                  | Fetch paginated notes with arrays tags list    | Yes           |
+| `POST`   | `/api/notes`                  | Add a new markdown-supported note              | Yes           |
+| `DELETE` | `/api/notes/[id]`             | Remove note                                    | Yes           |
+| `GET`    | `/api/flashcards`             | List flashcard reviews due                     | Yes           |
+| `POST`   | `/api/flashcards`             | Save new flashcard into deck                   | Yes           |
+| `PUT`    | `/api/flashcards/[id]/review` | Apply SM-2 spaced repetition feedback          | Yes           |
+| `GET`    | `/api/quests`                 | Load active daily Tavern quests                | Yes           |
+| `PUT`    | `/api/quests/[id]/complete`   | Log daily quest completion and trigger rewards | Yes           |
+| `GET`    | `/api/studio`                 | Get all pipeline Kanban tasks                  | Yes           |
+| `POST`   | `/api/studio`                 | Add Creator Kanban item                        | Yes           |
+| `PUT`    | `/api/studio/[id]`            | Drag and drop move task column status          | Yes           |
+| `GET`    | `/api/familiar`               | Load pet motivation stats                      | Yes           |
+| `PUT`    | `/api/familiar/feed`          | Feed familiar and restore HP                   | Yes           |
+| `GET`    | `/api/inventory`              | List acquired learning items                   | Yes           |
 
 ---
 
@@ -296,30 +308,49 @@ All paths are relative to the deployment root:
 
 ```
 LearnTracker/
-└── frontend/
-    ├── src/
-    │   ├── app/
-    │   │   ├── (dashboard)/             # Main protected section
-    │   │   │   ├── studio/              # Creator Pipeline Kanban page
-    │   │   │   ├── flashcards/          # Spaced repetition list page
-    │   │   │   └── quests/              # Tavern RPG Quests page
-    │   │   ├── api/                     # 100% Native Next.js serverless route handlers
-    │   │   │   ├── auth/                # signup and NextAuth handlers
-    │   │   │   ├── familiar/            # Tamagotchi status and feed endpoints
-    │   │   │   ├── quests/              # RPG Quests list and complete handlers
-    │   │   │   └── studio/              # Kanban board and task columns handlers
-    │   │   ├── login/                   # Elegant custom login page
-    │   │   └── globals.css              # Custom visual layout layer
-    │   ├── components/                  # Premium UI components
-    │   │   ├── studio/                  # Kanban KanbanColumn and AddTaskModal
-    │   │   └── ui/                      # Shared premium BrutalCard
-    │   ├── lib/
-    │   │   ├── api.ts                   # Relative path API fetch wrapper
-    │   │   ├── api-helpers.ts           # Standardized ok/err wrappers & session checks
-    │   │   └── db.ts                    # Neon PostgreSQL client initialization
-    │   └── store/
-    │       └── useDashboardStore.ts     # Frontend Zustand global store
-    └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── (dashboard)/             # Protected standalone user dashboard
+│   │   │   │   ├── dashboard/           # Bento Grid main cockpit
+│   │   │   │   ├── studio/              # Creator Studio Kanban board page
+│   │   │   │   ├── quests/              # Tavern RPG Quests page
+│   │   │   │   ├── inventory/           # Item chest inventory page
+│   │   │   │   ├── skills/              # Skill Tree page
+│   │   │   │   ├── flashcards/          # Flashcard spaced repetition deck
+│   │   │   │   ├── roadmaps/            # Learning roadmaps catalog
+│   │   │   │   ├── resources/           # Reference bookmarks database
+│   │   │   │   ├── logs/                # Study logs analytics history
+│   │   │   │   ├── schedule/            # Daily learning calendar page
+│   │   │   │   ├── progress/            # Analytics dashboard
+│   │   │   │   ├── settings/            # User settings profile management
+│   │   │   │   └── layout.tsx           # Dashboard routing wrapper
+│   │   │   ├── api/                     # Serverless Next.js API Routes
+│   │   │   │   ├── auth/                # Sign-up and session callbacks
+│   │   │   │   ├── familiar/            # tamagotchi companion controllers
+│   │   │   │   ├── quests/              # Daily quests generators and claims
+│   │   │   │   ├── studio/              # Creator Studio pipeline routes
+│   │   │   │   ├── projects/            # roadmaps and projects manager
+│   │   │   │   ├── notes/               # Markdown notes with array tags
+│   │   │   │   ├── inventory/           # Obtained item chest inventory
+│   │   │   │   └── dashboard/layout     # Persisted layout grids positions
+│   │   │   ├── login/                   # Matte SaaS Login screen
+│   │   │   ├── signup/                  # Matte SaaS Registration screen
+│   │   │   ├── layout.tsx               # Root app layout
+│   │   │   └── globals.css              # Matte SaaS theme, tokens and variables
+│   │   ├── components/                  # Shared and specialized components
+│   │   │   ├── layout/                  # DashboardLayout, Sidebar & GlassDrawer
+│   │   │   ├── dashboard/widgets/       # StreakWidget, VirtualFamiliarWidget, FocusTimer, etc.
+│   │   │   └── ui/                      # MatteCard UI component
+│   │   ├── lib/
+│   │   │   ├── api.ts                   # Fetch API wrapper
+│   │   │   ├── api-helpers.ts           # Response decorators & authentication helpers
+│   │   │   └── db.ts                    # Neon serverless client configurations
+│   │   └── store/
+│   │       └── useDashboardStore.ts     # zustand primary persistent global state
+│   └── package.json
+└── backend/
+    └── migrations/                      # DB Migrations (Initial, Auth.js, Level Configs, custom fields)
 ```
 
 ---
@@ -327,50 +358,35 @@ LearnTracker/
 ## 8. Development Roadmap
 
 ### Phase 1 — Foundation ✅
-- [x] Project scaffolding (Next.js Standalone Monorepo)
-- [x] Database schema design in Neon
-- [x] Bento Grid dashboard layout
-- [x] BrutalCard / Neo-Brutalism design system components
-- [x] All 5 main dashboard widgets (Streak, Roadmap, Timer, Daily Goals, Quick Note)
+- Scaffolding Next.js monorepo standalone server configurations.
+- Schema design and migrations mapping in Neon PostgreSQL.
+- Base core components framework setup.
 
-### Phase 2 — Core Functionality ✅
-- [x] Connect to Neon Serverless PostgreSQL with WebSocket template literals
-- [x] Standardized API JSON response wrappers
-- [x] Full CRUD Next.js Route Handlers (Notes, Flashcards, Quests, Kanban, etc.)
-- [x] Wire frontend store to real relative API paths (solving localhost fallback)
+### Phase 2 — Core Operations ✅
+- Standalone relative relative endpoints wiring.
+- Safe templates injection parameterized SQLite-style queries.
+- Connected widgets integrations: Roadmaps, study timers, notes.
 
-### Phase 3 — Gamification & RPG Mechanics ✅
-- [x] XP calculation engine and level-up thresholds logic
-- [x] Spaced Repetition (SM-2) algorithm for active flashcard review
-- [x] Daily Quest generation (weighted rank acak)
-- [x] Virtual Familiar (HP/Level/Feeding) state persistence
+### Phase 3 — Spaced Repetition & Gamification ✅
+- Spaced repetition deck with customized SM-2 reviews.
+- Tavern RNG dailies generator.
+- Tamagotchi motivation companion mechanics.
 
-### Phase 4 — Authentication & Multi-User Flow ✅
-- [x] NextAuth.js v5 integration with serverless Credentials Provider
-- [x] Password hashing using Bcrypt
-- [x] Secure session cookie tracking
-- [x] Multi-user data isolation across all database queries
+### Phase 4 — Security & Rebranding ✅
+- Standard next-auth strategies integration with credentials providers.
+- Bcrypt encryption setup.
+- Rebrand Learn Tracker fully to **Sinau.id**.
+- Migrate whole platform component styling to **Matte Dark SaaS** system using `MatteCard` interfaces.
 
-### Phase 5 — Refinements & AI 🔲
-- [ ] AI-assisted note summarization
-- [ ] AI roadmap suggestions
-- [ ] Mobile-first layout optimizations
-- [ ] PWA support for offline access
+### Phase 5 — Enhancements & AI Assist 🔲
+- AI-driven study planner and summaries generated from Notes.
+- Custom custom roadmaps suggestions.
+- Enhanced analytics.
 
 ---
 
 ## 9. Non-Functional Requirements
 
-| Requirement           | Target                                     |
-| --------------------- | ------------------------------------------ |
-| **Performance**       | Dashboard loads in < 1.5s on Vercel        |
-| **Responsiveness**    | Fully functional on mobile (375px+)        |
-| **API Response Time** | < 150ms for all Neon serverless endpoints  |
-| **Data Integrity**    | Strict parameterized template sql queries |
-
----
-
-## 10. Open Questions
-
-1. **AI Provider** — Which LLM provider for "AI Assist" feature (Google Gemini is highly recommended for direct token integration)?
-2. **Notification System** — Should we add push notifications for daily quest reminders or pet status alerts?
+- **Performance:** App loaded and operational in under 1.2 seconds.
+- **Design Consistency:** 100% adherence to standard Matte Dark SaaS style variables (Zinc background, `MatteCard` containers).
+- **Query Protection:** 100% database parameterized queries preventing standard vulnerabilities.

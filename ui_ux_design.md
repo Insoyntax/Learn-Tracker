@@ -1,103 +1,104 @@
-# 🎨 Learn Tracker - UI/UX Design System Specification
+# 🎨 Sinau.id - UI/UX Design System Specification
 
-Dokumen ini menjelaskan **filosofi desain, pola UX, sistem warna, tipografi, dan arsitektur visual** dari aplikasi **Learn Tracker**. Aplikasi ini mengusung tema **Gamified Productivity System (RPG Style)** dengan pergeseran estetika dari Glassmorphism ke **Neo-Brutalism Dark Mode**.
+This document details the **design philosophy, user experience patterns, typographic rules, and color systems** of the **Sinau.id** self-directed learning ecosystem. The interface is built upon the **Matte Dark SaaS** design framework, shifting away from aggressive brutalist edges to premium, sleek, and highly-immersive interfaces designed for hyper-focused workflows.
 
 ---
 
-## 🌌 1. Filosofi Desain (Aesthetics & Mood)
+## 🌌 1. Design Philosophy (Aesthetics & Mood)
 
-Desain UI/UX dari Learn Tracker dibangun menggunakan tema **Neo-Brutalism Dark Mode**. Estetika dirancang dengan kontras sangat tinggi, garis tegas kaku, warna-warna neon mencolok, dan sudut balok yang raw untuk memicu stimulus fokus dan produktivitas tinggi.
+The design system of **Sinau.id** utilizes a premium **Matte Dark SaaS** aesthetic. The layout balances deep zinc shades, soft rounded container panels, and highly-saturated luminous accent highlights to provide instant dopamine hits while preventing visual fatigue.
 
 ```mermaid
 graph TD
-    A[Neo-Brutalism Dark Theme] --> B[Brutal Cards]
-    A --> C[Tactile Micro-Animations]
-    A --> D[Chromatic Gamification]
+    A[Matte Dark SaaS Theme] --> B[MatteCard System]
+    A --> C[Pulsing Micro-Animations]
+    A --> D[Luminous Focus Highlights]
     
-    B --> B1[Solid Colors & Border-2 & Hard Shadows]
-    C --> C1[Framer Motion Bounce & Bubble Pop]
-    D --> D1[High Contrast Neon Accents]
+    B --> B1[bg-#1C1C1E & border-white/5 & rounded-2xl]
+    C --> C1[Framer Motion Spring Actions & Orb Breathe]
+    D --> D1[High Contrast Neon Glows]
 ```
 
-### Pilar Utama Estetika:
-* **Brutal Card (Gaya Balok):** Menggunakan warna kartu solid gelap gulita (`#191A1B`) dibalut dengan garis pembatas luar tebal 2px (`border-2 border-white/20`) dan efek bayangan offset kaku/blok (`shadow-[4px_4px_0px_0px]`). Tidak ada efek transparansi, opacity, atau blur.
-* **Typographic Impact:** Memberikan ruang visual yang besar pada font sans-serif tebal untuk headers dan logo, menjadikannya terkesan kokoh, tegas, dan tidak kenal kompromi.
-* **Minimalist Line-Art Assets:** Semua elemen ilustratif (empty state, dekorasi blueprint, maskot) digambar menggunakan format SVG line-art bergaya coretan sketsa kustom berwarna monokrom putih-abu demi estetika *raw/glitch*.
-* **Tactile Interactions:** Animasi hover dan tap dikonfigurasi untuk bergerak secara linear atau memantul kaku (spring bounce) demi merepresentasikan tombol konsol retro.
+### Core Design Foundations:
+
+- **Matte Card Surfaces:** Core content sections are contained in `MatteCard` panels. Cards feature a custom solid matte gray surface (`bg-[#1C1C1E]`), faint luminous borders (`border border-white/5`), subtle drop shadows (`shadow-md shadow-black/20`), and generous rounded corners (`rounded-2xl`). This ensures layout structures look cohesive without requiring visual clutter.
+- **Subtle Texture Overlays:** The application canvas background (`#121212`) features an ultra-faint SVG noise texture filter (`opacity: 0.02`) to create a physical "matte canvas" atmosphere, reducing standard screen glare.
+- **Typographic Impact:** Strong contrast is achieved by balancing heavy geometric heading typography with clean sans-serif body spacing to deliver optimal content scannability.
+- **Ambient Glowing Elements:** Integrated glowing orbs and pulsing signals are used as status guides to emphasize critical gamification checkpoints (like pet health status and timer durations).
 
 ---
 
-## 🎨 2. Palet Warna (Color System)
+## 🎨 2. Color System
 
-Sistem warna menggunakan kombinasi solid gelap dengan saturasi neon maksimal untuk memberikan stimulus "dopamine hit" instan.
+The palette features a clean zinc-based base contrasted with highly saturated accent tones that illuminate core interactive nodes.
 
-| Kegunaan Warna | Nama Warna | Kode HEX | Representasi Visual |
+| Accent Category | Tone Name | HEX Code | UX Purpose |
 | :--- | :--- | :---: | :--- |
-| **Latar Belakang Utama** | Pure Solid Dark | `#111111` | Latar belakang dasar aplikasi |
-| **Latar Belakang Kartu** | Core Card Gray | `#191A1B` | Kartu solid non-transparan |
-| **Aksen Utama / XP** | Neon Green | `#CFFF04` | Progress bar, HP sehat, status aktif |
-| **Aksen Streak / Gold** | Dragon Gold | `#F59E0B` | Level up, api streak, tombol aksi primer |
-| **Aksen RPG Rank S** | Solar Yellow | `#FCD34D` | Bounty level tersulit |
-| **Aksen RPG Rank A** | Glitch Fuchsia | `#F43F5E` | Bounty level tinggi |
-| **Aksen RPG Rank B** | Retro Cyan | `#06B6D4` | Bounty level menengah |
-| **Aksen RPG Rank C** | Cool Slate | `#64748B` | Bounty level harian |
+| **Canvas Background** | Pure Zinc Dark | `#121212` | Solid matte primary background |
+| **Card Surface** | Core Matte Gray | `#1C1C1E` | Unified surface container |
+| **Clean Primary** | White-Zinc | `#f4f4f5` | Default text and primary active buttons |
+| **Active Progress / XP**| Luminous Emerald | `#34d399` | Health meters, XP gains, completed indicators |
+| **Gamification / Level**| Dragon Amber | `#fbbf24` | Streak fire alerts, levels, milestone gains |
+| **RPG Rank S / Focus**  | Solar Yellow | `#fcd34d` | Extreme tasks, active focus indicators |
+| **RPG Rank A / Alerts**  | Glitch Rose | `#fb7185` | High difficulty bounties, urgent settings |
+| **RPG Rank B / Tech**    | Radiant Cyan | `#22d3ee` | Spaced repetition cards, tags selectors |
+| **Muted Accents** | Zinc Gray | `#a1a1aa` | Muted subtitle texts, inactive paths |
 
 ---
 
-## ✍️ 3. Tipografi & Hierarki Visual
+## ✍️ 3. Typography & Hierarki Visual
 
-Tipografi dirancang agar kokoh dan kontras tinggi di atas latar belakang gelap.
+Typographic hierarchies are tailored to differentiate system actions from readable learning content.
 
-* **Headings (Judul Halaman & Judul Widget):** Menggunakan font **Outfit** (Sans-serif tebal bulat modern) berkarakter tebal kaku (`font-black`) dan hampir selalu disajikan dalam huruf besar (*uppercase*).
-* **Body Text & Input:** Menggunakan font **Inter** (Sans-serif dengan keterbacaan tinggi) untuk menjamin log belajar, deskripsi kartu, dan catatan markdown terbaca dengan nyaman.
-* **Hierarki Font:**
-  * **H1 (Page Title):** `text-4xl (36px)` \| `font-Outfit` \| `font-bold` \| `uppercase` \| `text-white`
-  * **H2 (Card Headers):** `text-xl (20px)` \| `font-Outfit` \| `font-bold` \| `uppercase` \| `text-white`
-  * **Body (Regular):** `text-sm (14px)` \| `font-Inter` \| `font-bold` \| `text-slate-300`
-  * **Muted (Subtitles):** `text-xs (12px)` \| `font-Outfit` \| `font-bold` \| `text-slate-500`
+- **Headings & Badges:** Rendered in **Outfit** (a bold, rounded, modern geometric sans-serif) using strong weights (`font-black`) and clean letter-spacing rules. Primary metrics and badges are styled in uppercase to maintain a solid, premium SaaS dashboard authority.
+- **Body & Inputs:** Rendered in **Inter** (recognized for exceptional readability in dark mode interfaces). Inter is applied to learning logs, Markdown note views, and forms to ensure readability.
+- **Standard Hierarchy Classes:**
+  - **H1 (Page Title):** `text-4xl (36px)` \| `font-Outfit` \| `font-bold` \| `tracking-tight` \| `text-zinc-100`
+  - **H2 (Widget Title):** `text-lg (18px)` \| `font-Outfit` \| `font-semibold` \| `text-zinc-200`
+  - **Body (Regular):** `text-sm (14px)` \| `font-Inter` \| `font-normal` \| `text-zinc-400`
+  - **Muted Details:** `text-xs (12px)` \| `font-Outfit` \| `font-medium` \| `text-zinc-500`
 
 ---
 
-## 🗺️ 4. Layout & Tata Ruang (Space Partitioning)
+## 🗺️ 4. Layout & Navigation Grid
 
-Tata letak menggunakan partisi grid bento solid tanpa margin melengkung yang berlebihan.
+The cockpit workspace distributes sections using a streamlined persistent grid:
 
 ```
 +-------------------------------------------------------------+
-| [/\] LearnTracker  |  COMMAND CENTER (Header)               |
-|                    +----------------------------------------+
-| [ ] Dashboard      | [ Daily Progress ]  [ Active Roadmap ] |
-| [ ] Creator Studio | [ Streak: 5 Days ]  [ Blueprint SVG  ] |
-| [ ] Tavern Quests  |                                        |
-| [ ] Flashcards     +----------------------------------------+
-| [ ] Settings       | [ Active Bounties ]      [ Focus Timer]|
-|                    | [ Rank S: Task    ]      | 25:00 | [>] |
-+--------------------+----------------------------------------+
+| [S] Sinau.id  |  [Search Everything...]   (O) Familiar Orb  |
+|               +---------------------------------------------+
+| [x] Dashboard | [ Active Streak ]    [ Learning Roadmap   ] |
+| [ ] Studio    | [ Level 5: Expert ]    [ Step Tracker (85%) ] |
+| [ ] Quests    |                                             |
+| [ ] Skills    +---------------------------------------------+
+| [ ] Decks     | [ Daily RPG Tavern ]    [ Focus Pomodoro  ] |
+| [ ] Settings  | [ S: Complete Core ]    [ 25:00 - active ]  |
++---------------+---------------------------------------------+
 ```
 
-### Layout Grid Dinamis (Dashboard Layout Engine)
-1. **Sidebar Navigasi Kiri (Persistent):** Panel ramping dengan logo *triangle blueprint* di bagian atas, tombol-tombol navigasi bersiku tajam, dan status profil user "Hacker Plan" di bagian bawah.
-2. **Dashboard Widgets:**
-   * **Daily Progress Widget:** Menampilkan bar XP datar bersudut tajam berwarna Neon Green, jumlah api streak dalam bingkai kuning kaku, dan maskot.
-   * **Focus Timer Widget:** Waktu digital kaku berukuran raksasa dengan tombol status bergaya *retro console*.
-   * **Tavern Quests (Active Bounties):** Kartu daftar quest horizontal yang diberi penanda warna tebal solid sesuai tingkat Rank kesulitannya.
+### Layout Elements:
+
+1. **Persistent Navigation Sidebar:** Renders clean active route buttons. Ramps down from desktop persistent configurations to mobile navigation drawers via elegant responsive layouts.
+2. **Utility Top Navbar:** Integrates a comprehensive workspace search bar, a responsive notification utility, and the **Virtual Familiar Orb**—providing a clean motivating pet status feedback directly inside the primary navigation thread.
+3. **Responsive Bento Grid:** Distributes widgets dynamically based on viewport dimensions. Each container uses `MatteCard` interfaces to organize roadmaps, study timers, streak counters, and notes.
 
 ---
 
 ## 🎮 5. UX Karakteristik Fitur Utama
 
-### A. Tavern Quests (RPG Quest List)
-* **UX Flow:** Pengguna membuka Tavern Quests -> Quest RNG dengan Rank muncul -> Selesaikan tugas riil -> Klik `"Claim Bounty"` -> Terjadi letusan confetti dan penambahan XP bar secara asinkron.
-* **UI Design:** Kartu menggunakan border hitam tebal dengan aksen warna solid di sudutnya untuk menandakan Rank (kuning untuk S, fuchsia untuk A, cyan untuk B, abu-abu untuk C) serta efek melayang statis saat hover.
+### A. Tavern Quests RPG Board
+- **UX Flow:** Users check active Tavern Quests -> Trigger RNG to roll fresh bounties -> Complete task checks -> Click `Claim Bounty` to earn XP and items. Completed cards trigger confetti and update the persistent XP bar.
+- **UI Design:** Cards use thin border colors matching bounty ranks (Rose for A, Yellow for S, Cyan for B). Hover triggers subtle transformations to reinforce interactiveness.
 
-### B. Creator Studio (Kanban Board)
-* **UX Flow:** Transisi drag-and-drop tugas kanban. Saat ditarik, muncul kotak pengganti bergaris putus-putus solid dengan bayangan tegas di posisi peletakan.
-* **UI Design:** Kartu status tugas didesain bersiku tajam 90 derajat tanpa lengkungan (*rounded-none*) dengan variasi border neon yang mencolok ketika tugas berstatus aktif.
+### B. Creator Studio (Kanban Tasks Pipeline)
+- **UX Flow:** Smooth drag-and-drop actions built on `@dnd-kit`. Dragging a task displays a dashed drop indicator and updates status columns dynamically.
+- **UI Design:** Cards feature clean borders, category highlights, and details. Column separators are rendered with thin borders for a modern look.
 
-### C. SRS Flashcards (Sistem Kartu Pintar)
-* **UX Flow:** Tap kartu -> Kartu berputar Y 180 derajat secara linear dan tegas -> Tampilkan jawaban beserta tombol umpan balik kualitas memori (Easy, Medium, Hard).
-* **UI Design:** Sisi belakang kartu dibingkai border merah/kuning/hijau solid untuk membedakan opsi tingkat hafalan secara visual.
+### C. Spaced Repetition (SRS) Decks
+- **UX Flow:** Click flashcards to trigger Y-axis 180-degree card flips. Once flipped, users select a qualitative memory recall grade (Easy, Medium, Hard) to schedule the next review date via the SM-2 algorithm.
+- **UI Design:** Back sides feature subtle indicators (emerald for Easy, amber for Medium, rose for Hard) to assist users during memory reviews.
 
-### D. Familiar Pet System (Tamagotchi RPG)
-* **UX Flow:** Hewan peliharaan (familiar) berada di dashboard dengan level statis. Saat user produktif, mereka mendapatkan item pakan untuk memulihkan HP-nya.
-* **UI Design:** Menggunakan maskot **Minimalist SVG Tech-Blob** berbentuk alien bergaris putih solid lengkap dengan mata piksel kaku, antena neon, serta gelembung chat persegi dengan bayangan tajam yang muncul saat diklik. HP bar digambarkan tebal tanpa radius kelengkungan dengan warna Neon Green atau merah menyala (saat sekarat).
+### D. Virtual Familiar Motivator
+- **UX Flow:** The companion is displayed inside dashboard widgets and the top navbar (Familiar Orb). Users restore companion health using items from their inventory or by logging focus hours.
+- **UI Design:** The companion is styled as a modern **SVG Tech-Blob** mascot with subtle floating animations, pulsing antennas, and custom chat bubbles. The health bar is rendered as a clean, rounded emerald line indicating active stamina.

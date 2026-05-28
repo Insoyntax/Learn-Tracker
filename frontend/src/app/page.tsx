@@ -6,7 +6,7 @@ export default function LandingPage() {
         <main className="min-h-screen bg-[#121212] text-zinc-100 flex flex-col items-center justify-center overflow-hidden relative">
             
             {/* Ambient Background Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-cyan-500/10 blur-[120px] pointer-events-none rounded-full" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/10 blur-[100px] pointer-events-none rounded-full" />
             
             <nav className="absolute top-0 w-full px-8 py-6 flex items-center justify-between z-10 border-b border-white/5 bg-[#121212]/80 backdrop-blur-md">
                 <div className="flex items-center gap-2">
@@ -40,7 +40,7 @@ export default function LandingPage() {
                     Sinau.id merges professional LMS architecture with subtle gamification to keep you focused, organized, and consistently leveling up.
                 </p>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
                     <Link href="/signup" className="group flex items-center gap-2 px-8 py-4 rounded-xl bg-zinc-100 text-zinc-950 font-semibold text-base hover:bg-zinc-200 transition-all shadow-lg shadow-zinc-100/10">
                         Get Started Free
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

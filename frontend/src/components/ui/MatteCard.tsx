@@ -29,8 +29,8 @@ export const MatteCard = ({
             className={`
                 relative overflow-hidden rounded-2xl
                 bg-[#1C1C1E]
-                border border-white/5
-                shadow-md shadow-black/20
+                border border-white/10
+                shadow-lg shadow-black/40
                 ${className}
             `}
             {...props}

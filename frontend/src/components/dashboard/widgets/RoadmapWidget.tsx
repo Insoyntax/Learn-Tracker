@@ -83,7 +83,7 @@ export const RoadmapWidget = ({ className }: { className?: string }) => {
 
     if (!activeRoadmap) {
         return (
-            <MatteCard className={`p-8 flex items-center justify-center relative overflow-hidden ${className}`}>
+            <MatteCard className={`h-full w-full p-8 flex flex-col items-center justify-center relative overflow-hidden ${className}`}>
                 <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
                     <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
                         <circle cx="100" cy="100" r="70" stroke="rgba(56,189,248,0.5)" strokeWidth="1" strokeDasharray="4 6" />

@@ -56,10 +56,10 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
                                 href={item.href}
                                 onClick={() => setIsMobileMenuOpen(false)}
                                 className={`
-                                    flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
+                                    flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors border-l-2
                                     ${isActive 
-                                        ? "bg-white/5 text-cyan-400" 
-                                        : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.02]"}
+                                        ? "bg-white/5 text-zinc-100 border-zinc-100 rounded-l-none" 
+                                        : "border-transparent text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.02]"}
                                 `}
                             >
                                 <item.icon className={`w-4 h-4 ${isActive ? "text-cyan-400" : "text-zinc-500"}`} />

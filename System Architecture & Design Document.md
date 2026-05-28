@@ -1,12 +1,12 @@
-# 📐 Learn Tracker - System Architecture & Design Document
+# 📐 Sinau.id - System Architecture & Design Document
 
-Dokumen ini menjelaskan arsitektur sistem, desain database, sistem state manajemen, dan alur autentikasi dari proyek **Learn Tracker** setelah berhasil dimigrasikan sepenuhnya dari arsitektur backend Go terpisah ke dalam arsitektur **Full-Stack Next.js Standalone**.
+This document explains the system architecture, database design, client-side state management, and security structures of the **Sinau.id** platform. The application is built using a unified, high-performance **Full-Stack Next.js Standalone** architecture connected directly to serverless PostgreSQL.
 
 ---
 
 ## 🏗️ 1. High-Level Architecture
 
-Sistem Learn Tracker menggunakan arsitektur modern full-stack monolitik berbasis **Next.js App Router** yang di-deploy di cloud serverless (Vercel) dan terhubung langsung ke serverless PostgreSQL (Neon DB).
+The system utilizes a modern, serverless monolithic architecture powered by **Next.js App Router** deployed on serverless environments (Vercel) and connected to a serverless database instance (Neon DB).
 
 ```mermaid
 graph TD
@@ -33,25 +33,29 @@ graph TD
     APIRoutes -->|4. Safe Parameter Queries| NeonDB
 ```
 
-### Key Decisions & Rationale:
-* **Go to Next.js API Routes Migration:** Mengurangi latensi *cold-start* koneksi antar server, meniadakan biaya deployment backend tambahan (seperti Render gratisan yang sering tertidur), mempermudah pemeliharaan dalam satu repositori tunggal (Monorepo), dan mengoptimalkan integrasi NextAuth.js.
-* **Relative API Base URL (`/api`):** Semua request client kini bersifat relatif terhadap domain host. Tidak memerlukan konfigurasi manual `NEXT_PUBLIC_API_URL` baik saat development di localhost maupun production di Vercel.
-* **Neon PostgreSQL Serverless:** Database PostgreSQL awan yang mendukung konektivitas serverless super cepat berbasis WebSocket lewat driver `@neondatabase/serverless`.
+### Architectural Decisions & Rationale:
+
+- **Unified Next.js API Routes:** Eliminates cold-start latencies and extra deployment overheads that occur with a separated Go/Node backend. It keeps client-server bindings extremely simple, simplifies standard deployments, and ensures robust credentials checking via NextAuth.
+- **Relative API Calls (`/api`):** All client data fetching is routed relatively against the active host domain. No manual API endpoint configurations are needed when changing environments (development, staging, or production).
+- **Neon Serverless PostgreSQL:** A fast, cloud-based PostgreSQL instance utilizing WebSocket templates powered by the `@neondatabase/serverless` driver for near-instant SQL execution.
 
 ---
 
 ## 🗄️ 2. Database Schema Design
 
-Database tersimpan di Neon PostgreSQL dengan relasi tabel sebagai berikut. RPG gamification diintegrasikan secara terpadu di dalam tabel pengguna utama.
+The database schema is mapped inside Neon PostgreSQL. Custom tables are designed to handle study tracking, SRS reviews, RPG task pipelines, daily rewards, and virtual motivation companion states.
 
 ```mermaid
 erDiagram
     users {
         serial id PK
+        varchar name
+        varchar email UK
+        timestamp emailVerified
+        varchar image
         varchar username UK
         varchar password_hash
-        varchar full_name
-        varchar birthdate
+        date birthdate
         varchar school
         integer xp
         integer level
@@ -62,11 +66,12 @@ erDiagram
 
     notes {
         serial id PK
-        integer user_id FK
         varchar title
         text content
-        varchar category
+        varchar[] tags
+        integer user_id FK
         timestamp created_at
+        timestamp updated_at
     }
 
     flashcards {
@@ -107,30 +112,65 @@ erDiagram
     users ||--o{ studio_tasks : "manages"
 ```
 
-### Detail Skema Tabel Utama:
+### Table Definitions & Implementations:
 
-#### A. Users Table (dengan RPG Stats Terintegrasi)
-Tabel ini menyimpan profil pengguna sekaligus status gamifikasi (Tamagotchi / RPG system):
+#### A. Users Table (Core Profile & RPG Motivation Stats)
+This table acts as the unified user database containing security credentials alongside active gamification state records:
 ```sql
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
-    birthdate VARCHAR(50),
-    school VARCHAR(100),
-    xp INTEGER DEFAULT 0,
-    level INTEGER DEFAULT 1,
-    current_streak INTEGER DEFAULT 0,
-    theme_color VARCHAR(50) DEFAULT '#10B981',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name VARCHAR(255),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    "emailVerified" TIMESTAMPTZ,
+    image TEXT,
+    username VARCHAR(255) UNIQUE,
+    password_hash VARCHAR(255),
+    birthdate DATE,
+    school VARCHAR(255),
+    xp INTEGER NOT NULL DEFAULT 0,
+    level INTEGER NOT NULL DEFAULT 1,
+    current_streak INTEGER NOT NULL DEFAULT 0,
+    theme_color VARCHAR(50) DEFAULT '#6366f1'
 );
 ```
 
-#### B. Studio Tasks Table (Kanban Board)
-Menyimpan tugas pipeline kreator dengan penyesuaian status huruf kapital (`TODO`, `IN_PROGRESS`, `REVIEW`, `DONE`):
+#### B. Notes Table (with Tag Arrays & Search Support)
+Notes table utilizes native PostgreSQL text arrays (`TEXT[]`) and GIN indices for highly efficient tags filtration and full-text searches:
 ```sql
-CREATE TABLE studio_tasks (
+CREATE TABLE IF NOT EXISTS notes (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL DEFAULT '',
+    tags TEXT[] NOT NULL DEFAULT '{}',
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Fast array indexation
+CREATE INDEX IF NOT EXISTS idx_notes_tags ON notes USING GIN (tags);
+
+-- Fast English search dictionary vectorization
+CREATE INDEX IF NOT EXISTS idx_notes_title_content ON notes USING GIN (
+    to_tsvector('english', title || ' ' || content)
+);
+```
+
+#### C. Level Configs Lookup Table
+Standard lookup configurations holding strict XP thresholds per level, referencing badges from Novice to Transcendent:
+```sql
+CREATE TABLE IF NOT EXISTS level_configs (
+    level INTEGER PRIMARY KEY,
+    min_xp INTEGER NOT NULL,
+    max_xp INTEGER NOT NULL,
+    title_badge VARCHAR(100) NOT NULL DEFAULT ''
+);
+```
+
+#### D. Studio Tasks Table (Creator Studio Kanban Board)
+Stores Kanban tasks categorized by standard column indicators (`TODO`, `IN_PROGRESS`, `REVIEW`, `DONE`):
+```sql
+CREATE TABLE IF NOT EXISTS studio_tasks (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
@@ -141,10 +181,10 @@ CREATE TABLE studio_tasks (
 );
 ```
 
-#### C. Flashcards Table (SRS Spaced Repetition)
-Menggunakan algoritma pengulangan SM-2 (SuperMemo-2) dengan interval hari dan *Ease Factor*:
+#### E. Flashcards Table (SM-2 Spaced Repetition Parameters)
+Keeps spaced repetition scheduling records referencing memory decay attributes:
 ```sql
-CREATE TABLE flashcards (
+CREATE TABLE IF NOT EXISTS flashcards (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     front TEXT NOT NULL,
@@ -161,7 +201,7 @@ CREATE TABLE flashcards (
 
 ## 🔐 3. Authentication & Security Design
 
-Autentikasi diimplementasikan menggunakan **NextAuth.js v5 (Auth.js)** dengan strategi JWT (*JSON Web Tokens*).
+Authentication is managed via **NextAuth.js v5 (Auth.js)** implementing custom Credentials Flow configurations and encrypted JSON Web Tokens (JWT).
 
 ```mermaid
 sequenceDiagram
@@ -169,23 +209,24 @@ sequenceDiagram
     participant NextAuth as NextAuth Handler
     participant DB as Neon Database
 
-    Browser->>NextAuth: POST /api/auth/signup (Nama, Username, Password)
-    NextAuth->>DB: Hash password dengan Bcrypt & Simpan User Baru
+    Browser->>NextAuth: POST /api/auth/signup (username, email, password)
+    NextAuth->>DB: Hash credentials with Bcrypt & Save new User records
     DB-->>NextAuth: User Created OK
     NextAuth-->>Browser: Sign Up Success
 
-    Browser->>NextAuth: POST /api/auth/callback/credentials (Username, Password)
-    NextAuth->>DB: Ambil user berdasarkan Username
-    DB-->>NextAuth: Kembalikan password_hash
-    NextAuth->>NextAuth: Bandingkan password dengan Bcrypt.compare()
-    NextAuth->>NextAuth: Generate JWT Token & Enkripsi
+    Browser->>NextAuth: POST /api/auth/callback/credentials (username/email, password)
+    NextAuth->>DB: Fetch active user record
+    DB-->>NextAuth: Return encrypted password_hash
+    NextAuth->>NextAuth: Validate using Bcrypt.compare()
+    NextAuth->>NextAuth: Generate encrypted session JWT token
     NextAuth-->>Browser: Set session-cookie (HTTPOnly, Secure)
 ```
 
-### Keamanan Tambahan:
-1. **HTTPOnly Cookies:** Token autentikasi disimpan di dalam cookie berproteksi `HTTPOnly`, mencegah pencurian token via serangan XSS (Cross-Site Scripting).
-2. **Serverless Session Verification Helper (`getAuthUserId`):**
-   Setiap endpoint serverless dilindungi oleh fungsi pembantu untuk memvalidasi token sesi secara internal langsung dari server:
+### Security Measures:
+
+1. **HTTPOnly Session Cookies:** Prevents client-side scripts from reading active credentials tokens, neutralizing standard XSS token theft vectors.
+2. **Server-Side Session Verification Helper (`getAuthUserId`):**
+   Endpoints are secured with a server helper that checks active session tokens inside route threads:
    ```typescript
    export async function getAuthUserId() {
      const session = await auth();
@@ -200,35 +241,8 @@ sequenceDiagram
 
 ## 🎨 4. Frontend Design System & Client State
 
-Antarmuka dibangun dengan estetika **Neo-Brutalism Dark Mode**:
-* **UI Framework:** Tailwind CSS v4 dengan integrasi font Google Fonts `Outfit` (untuk heading/aksen uppercase) dan `Inter` (untuk teks deskripsi/body).
-* **Desain Kartu:** `BrutalCard` (terintegrasi melalui `GlassCard`) dengan warna solid dark (`#191A1B`), border hitam/putih tegas ketebalan 2px (`border-2 border-white/20`), shadow kaku/blok (`shadow-[4px_4px_0px_0px]`), dan tanpa opacity atau backdrop-blur.
-* **Aksen Dopamin & Gamifikasi:** Menggunakan warna-warna neon mencolok dengan kontras sangat tinggi seperti Neon Green (`#CFFF04`) dan Dragon Gold (`#F59E0B`) sebagai aksen utama untuk timer, XP/level bar, dan status streak.
-* **Doodle Line-Art Empty States:** Menggunakan ilustrasi SVG line-art bertema blueprint untuk area kosong pada widget guna menghadirkan estetika "raw" yang memicu produktivitas tinggi.
-* **Animasi & Interaksi:** Framer Motion untuk transisi halaman, modal, micro-animations pada tombol gamifikasi (misal animasi detak, tap scaling, dan gelembung balon percakapan virtual familiar).
-* **Kanban Drag & Drop:** `@dnd-kit/core` & `@dnd-kit/sortable` untuk fungsionalitas drag-and-drop tugas kanban secara presisi dengan representasi bayangan lokal.
-* **State Management:** **Zustand** global store dengan integrasi sinkronisasi API asinkron.
+The UI is built upon the **Matte Dark SaaS** design aesthetic:
 
----
-
-## ⚙️ 5. API Response Standardization
-
-Semua Serverless Route Handlers di Next.js mengembalikan struktur respons seragam untuk memudahkan *client-side unwrapping* di frontend:
-
-* **Format Sukses:**
-  ```json
-  {
-    "status": "success",
-    "data": { ... }
-  }
-  ```
-* **Format Gagal:**
-  ```json
-  {
-    "status": "error",
-    "code": "ERROR_CODE",
-    "message": "Detail pesan error untuk user"
-  }
-  ```
-
-Pola ini secara otomatis didukung oleh parser client `api.ts` yang secara dinamis mendeteksi kunci `status: "success"` atau `success: true` untuk membuka bungkus data (`json.data`) sebelum diteruskan ke Zustand store.
+- **Base Components:** Container blocks are powered by `MatteCard`, characterized by uniform soft elements: solid matte background (`bg-[#1C1C1E]`), razor-thin border shadows (`border border-white/5`), subtle dark drop shadow elements (`shadow-md shadow-black/20`), and generous rounded corners (`rounded-2xl`).
+- **Accent Theme Variables:** Configured inside `@theme` in `globals.css` targeting premium focus colors: clean primary whites (`#f4f4f5`), deep backgrounds (`#121212`), emerald accents for level up/healthy companion HP, amber for streaks, and bright cyan/rose indicators for RPG task difficulty levels.
+- **Client State System:** Powered by a persistent **Zustand** store framework that coordinates local caching alongside background relative asynchronous API calls (`api.ts`).

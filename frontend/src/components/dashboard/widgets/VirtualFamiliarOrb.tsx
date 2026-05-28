@@ -2,6 +2,7 @@
 
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export const VirtualFamiliarOrb = ({ className }: { className?: string }) => {
@@ -19,16 +20,21 @@ export const VirtualFamiliarOrb = ({ className }: { className?: string }) => {
 
     return (
         <div className={cn("relative flex items-center justify-center", className)}>
-            <div 
+            <motion.div 
+                animate={{
+                    scale: [1, 1.05, 1],
+                    opacity: [0.8, 1, 0.8],
+                }}
+                transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                }}
                 className={cn(
-                    "absolute inset-0 rounded-full blur-md opacity-60 orb-breathe",
-                    isHealthy ? "bg-emerald-400" : isDanger ? "bg-rose-400" : "bg-amber-400"
-                )} 
-            />
-            <div 
-                className={cn(
-                    "relative w-full h-full rounded-full shadow-inner border border-white/20 z-10",
-                    isHealthy ? "bg-emerald-500" : isDanger ? "bg-rose-500" : "bg-amber-500"
+                    "w-full h-full rounded-full z-10",
+                    isHealthy ? "bg-emerald-400 shadow-[0_0_24px_rgba(52,211,153,0.5)]" : 
+                    isDanger ? "bg-rose-400 shadow-[0_0_24px_rgba(251,113,133,0.5)]" : 
+                    "bg-amber-400 shadow-[0_0_24px_rgba(251,191,36,0.5)]"
                 )}
             />
         </div>
