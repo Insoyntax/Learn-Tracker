@@ -109,11 +109,21 @@ export interface StudioTask {
     createdAt: string; // ISO string
 }
 
+export interface PlannedSession {
+    id: string; // uuid
+    title: string;
+    startTime: string; // ISO string
+    endTime: string; // ISO string
+    referenceType: 'roadmap' | 'studio' | 'custom';
+    referenceId?: string; // id of the linked roadmap or studio task
+}
+
 export interface AppSettings {
     accentColor: string;
     soundEnabled: boolean;
     userName: string;
     defaultTimerMinutes: number;
+    hasCompletedOnboarding: boolean;
 }
 
 export interface DashboardLayoutItem {
@@ -156,6 +166,7 @@ interface DashboardState {
     flashcards: Flashcard[];
     inventoryItems: InventoryItem[];
     studioTasks: StudioTask[];
+    plannedSessions: PlannedSession[];
 
     // Actions
     fetchInitialData: () => Promise<void>;
@@ -208,6 +219,10 @@ interface DashboardState {
     addStudioTask: (data: Omit<StudioTask, "id" | "createdAt" | "status">) => void;
     moveStudioTask: (id: string, newStatus: StudioTaskStatus) => void;
     deleteStudioTask: (id: string) => void;
+
+    // Schedule Actions
+    addPlannedSession: (session: Omit<PlannedSession, "id">) => void;
+    deletePlannedSession: (id: string) => void;
 
     // Settings Actions
     updateSettings: (settings: Partial<AppSettings>) => void;
@@ -305,6 +320,7 @@ export const useDashboardStore = create<DashboardState>()(
                 soundEnabled: true,
                 userName: "Student",
                 defaultTimerMinutes: 25,
+                hasCompletedOnboarding: false,
             },
 
             // Layout defaults
@@ -337,6 +353,7 @@ export const useDashboardStore = create<DashboardState>()(
             flashcards: [],
             inventoryItems: [],
             studioTasks: [],
+            plannedSessions: [],
 
             // ── Actions ──────────────────────────────────────────────────────────────
 
@@ -1103,6 +1120,21 @@ export const useDashboardStore = create<DashboardState>()(
                 }
             },
 
+            // ── Schedule Actions ─────────────────────────────────────────────────────
+
+            addPlannedSession: (data) =>
+                set((state) => ({
+                    plannedSessions: [...state.plannedSessions, {
+                        ...data,
+                        id: crypto.randomUUID()
+                    }]
+                })),
+
+            deletePlannedSession: (id) =>
+                set((state) => ({
+                    plannedSessions: state.plannedSessions.filter(s => s.id !== id)
+                })),
+
             // ── Settings Actions ─────────────────────────────────────────────────────
 
             updateSettings: (newSettings) =>
@@ -1177,6 +1209,7 @@ export const useDashboardStore = create<DashboardState>()(
                 flashcards: state.flashcards,
                 inventoryItems: state.inventoryItems,
                 studioTasks: state.studioTasks,
+                plannedSessions: state.plannedSessions,
             }),
             storage: createJSONStorage(() =>
                 typeof window !== "undefined" ? localStorage : {

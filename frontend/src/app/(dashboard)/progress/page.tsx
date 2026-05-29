@@ -4,7 +4,11 @@ import { MatteCard } from "@/components/ui/MatteCard";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { CheckCircle2, TrendingUp, BarChart3, Trophy } from "lucide-react";
 
+import { useDashboardStore } from "@/store/useDashboardStore";
+
 export default function ProgressPage() {
+    const roadmaps = useDashboardStore(s => s.roadmaps || []);
+
     return (
         <div className="h-full flex flex-col space-y-6 max-w-5xl mx-auto">
             {/* Header */}
@@ -22,24 +26,21 @@ export default function ProgressPage() {
                     <h2 className="text-lg font-semibold text-zinc-100 tracking-tight">Active Roadmaps</h2>
                     
                     <div className="space-y-4">
-                        <RoadmapProgressCard 
-                            title="Fullstack Web Development" 
-                            category="Engineering" 
-                            progress={65} 
-                            color="cyan"
-                        />
-                        <RoadmapProgressCard 
-                            title="UI/UX Design Systems" 
-                            category="Design" 
-                            progress={32} 
-                            color="rose"
-                        />
-                        <RoadmapProgressCard 
-                            title="Data Structures & Algorithms" 
-                            category="Computer Science" 
-                            progress={89} 
-                            color="emerald"
-                        />
+                        {roadmaps.length > 0 ? (
+                            roadmaps.map((r, i) => (
+                                <RoadmapProgressCard 
+                                    key={r.id}
+                                    title={r.title} 
+                                    category={r.tags?.[0] || "General"} 
+                                    progress={r.progress || 0} 
+                                    color={i % 3 === 0 ? "cyan" : i % 3 === 1 ? "rose" : "emerald"}
+                                />
+                            ))
+                        ) : (
+                            <MatteCard className="p-6 flex flex-col items-center justify-center text-center opacity-50 border-dashed min-h-[200px]">
+                                <p className="text-sm text-zinc-400 font-medium">No roadmaps to track.</p>
+                            </MatteCard>
+                        )}
                     </div>
                 </div>
 

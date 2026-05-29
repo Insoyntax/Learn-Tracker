@@ -3,8 +3,10 @@
 import { MatteCard } from "@/components/ui/MatteCard";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Search, Plus, MoreHorizontal, MessageSquare, Paperclip } from "lucide-react";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 export default function StudioPage() {
+    const studioTasks = useDashboardStore(s => s.studioTasks || []);
     return (
         <div className="h-full flex flex-col space-y-6 max-w-[1600px] mx-auto overflow-hidden">
             {/* Header */}
@@ -33,102 +35,50 @@ export default function StudioPage() {
             <div className="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar pb-4">
                 <div className="flex gap-6 h-full min-w-[1000px]">
                     
-                    {/* To Do Column */}
-                    <div className="flex-1 flex flex-col min-w-[280px]">
-                        <div className="flex items-center justify-between mb-4 px-1">
-                            <h3 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-zinc-500" />
-                                To Do
-                            </h3>
-                            <span className="text-xs text-zinc-500 font-medium bg-white/5 px-2 py-0.5 rounded-full">3</span>
-                        </div>
-                        <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
-                            <TaskCard 
-                                title="Read Chapter 4: Neural Networks" 
-                                course="Deep Learning 101"
-                                priority="High" 
-                                color="rose"
-                            />
-                            <TaskCard 
-                                title="Set up Next.js Boilerplate" 
-                                course="Fullstack Dev"
-                                priority="Medium" 
-                                color="amber"
-                            />
-                            <TaskCard 
-                                title="Write Essay Outline" 
-                                course="English Lit"
-                                priority="Low" 
-                                color="cyan"
-                            />
-                        </div>
-                    </div>
+                    {(['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'] as const).map(status => {
+                        const columnTasks = studioTasks.filter(t => t.status === status);
+                        
+                        const statusConfig = {
+                            TODO: { label: 'To Do', color: 'bg-zinc-500', textColor: 'text-zinc-300' },
+                            IN_PROGRESS: { label: 'In Progress', color: 'bg-cyan-400', textColor: 'text-cyan-400' },
+                            REVIEW: { label: 'Under Review', color: 'bg-amber-400', textColor: 'text-amber-400' },
+                            DONE: { label: 'Completed', color: 'bg-emerald-400', textColor: 'text-emerald-400' }
+                        }[status];
 
-                    {/* In Progress Column */}
-                    <div className="flex-1 flex flex-col min-w-[280px]">
-                        <div className="flex items-center justify-between mb-4 px-1">
-                            <h3 className="text-sm font-semibold text-cyan-400 flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-cyan-400" />
-                                In Progress
-                            </h3>
-                            <span className="text-xs text-zinc-500 font-medium bg-white/5 px-2 py-0.5 rounded-full">1</span>
-                        </div>
-                        <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
-                            <TaskCard 
-                                title="Implement JWT Authentication" 
-                                course="Backend Architecture"
-                                priority="High" 
-                                color="rose"
-                                active
-                            />
-                        </div>
-                    </div>
-
-                    {/* Approval Column */}
-                    <div className="flex-1 flex flex-col min-w-[280px]">
-                        <div className="flex items-center justify-between mb-4 px-1">
-                            <h3 className="text-sm font-semibold text-amber-400 flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-amber-400" />
-                                Under Review
-                            </h3>
-                            <span className="text-xs text-zinc-500 font-medium bg-white/5 px-2 py-0.5 rounded-full">1</span>
-                        </div>
-                        <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
-                            <TaskCard 
-                                title="Submit Draft for Peer Review" 
-                                course="English Lit"
-                                priority="Medium" 
-                                color="amber"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Completed Column */}
-                    <div className="flex-1 flex flex-col min-w-[280px]">
-                        <div className="flex items-center justify-between mb-4 px-1">
-                            <h3 className="text-sm font-semibold text-emerald-400 flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                                Completed
-                            </h3>
-                            <span className="text-xs text-zinc-500 font-medium bg-white/5 px-2 py-0.5 rounded-full">2</span>
-                        </div>
-                        <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
-                            <TaskCard 
-                                title="Watch Lecture 1 & 2" 
-                                course="Deep Learning 101"
-                                priority="Medium" 
-                                color="amber"
-                                completed
-                            />
-                            <TaskCard 
-                                title="Design Database Schema" 
-                                course="Backend Architecture"
-                                priority="High" 
-                                color="rose"
-                                completed
-                            />
-                        </div>
-                    </div>
+                        return (
+                            <div key={status} className="flex-1 flex flex-col min-w-[280px]">
+                                <div className="flex items-center justify-between mb-4 px-1">
+                                    <h3 className={`text-sm font-semibold ${statusConfig.textColor} flex items-center gap-2`}>
+                                        <span className={`w-2 h-2 rounded-full ${statusConfig.color}`} />
+                                        {statusConfig.label}
+                                    </h3>
+                                    <span className="text-xs text-zinc-500 font-medium bg-white/5 px-2 py-0.5 rounded-full">
+                                        {columnTasks.length}
+                                    </span>
+                                </div>
+                                <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar pr-2">
+                                    {columnTasks.length === 0 ? (
+                                        <MatteCard className="p-6 flex flex-col items-center justify-center text-center opacity-50 border-dashed">
+                                            <p className="text-sm text-zinc-400 font-medium">No tasks yet.</p>
+                                            {status === 'TODO' && <p className="text-xs text-zinc-500 mt-1">Create your first mission.</p>}
+                                        </MatteCard>
+                                    ) : (
+                                        columnTasks.map(task => (
+                                            <TaskCard 
+                                                key={task.id}
+                                                title={task.title} 
+                                                course={task.categoryId || "General"}
+                                                priority="Normal" 
+                                                color={status === 'DONE' ? 'zinc' : 'cyan'}
+                                                active={status === 'IN_PROGRESS'}
+                                                completed={status === 'DONE'}
+                                            />
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
 
                 </div>
             </div>

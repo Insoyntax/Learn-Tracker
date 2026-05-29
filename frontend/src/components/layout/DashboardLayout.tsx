@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useDashboardStore } from "@/store/useDashboardStore";
 import {
     LayoutDashboard,
     CalendarDays,
@@ -24,7 +25,19 @@ const NAV_ITEMS = [
 
 export const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     const pathname = usePathname();
+    const router = useRouter();
+    const hasCompletedOnboarding = useDashboardStore(s => s.settings.hasCompletedOnboarding);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    useEffect(() => {
+        if (!hasCompletedOnboarding) {
+            router.push("/onboarding");
+        }
+    }, [hasCompletedOnboarding, router]);
+
+    if (!hasCompletedOnboarding) {
+        return null; // prevent flashing
+    }
 
     return (
         <div className="min-h-screen bg-[#121212] flex flex-col md:flex-row text-zinc-100 font-sans">
