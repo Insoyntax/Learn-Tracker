@@ -31,7 +31,7 @@ export default function ProgressPage() {
                                 <RoadmapProgressCard 
                                     key={r.id}
                                     title={r.title} 
-                                    category={r.tags?.[0] || "General"} 
+                                    category={r.category || "General"} 
                                     progress={r.progress || 0} 
                                     color={i % 3 === 0 ? "cyan" : i % 3 === 1 ? "rose" : "emerald"}
                                 />

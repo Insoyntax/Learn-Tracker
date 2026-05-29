@@ -44,15 +44,15 @@ export async function POST(req: Request) {
 
         const payload = {
             roadmap: {
-                id: crypto.randomUUID(),
+                id: Math.floor(Math.random() * 100000),
                 title: roadmapTitle,
-                description: `A starter roadmap focused on ${focus}.`,
-                progress: 0,
-                totalNodes: 5,
-                completedNodes: 0,
-                color: 'cyan',
-                tags: [focus, 'Starter'],
-                createdAt: new Date().toISOString()
+                category: focus,
+                steps: [
+                    { id: 1, title: tasks[0], isCompleted: false },
+                    { id: 2, title: tasks[1], isCompleted: false },
+                    { id: 3, title: tasks[2], isCompleted: false }
+                ],
+                progress: 0
             },
             studioTasks: tasks.map(t => ({
                 id: crypto.randomUUID(),
